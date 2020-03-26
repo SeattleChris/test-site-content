@@ -34,26 +34,28 @@ Current Status:
 
 ### Setup
 
-- [x] Initial research on Google Cloud Platform - Compute Engine
-- [x] Create a VM template with our appropriate settings
+- [x] Initial research on Google Cloud Platform - Compute Engine.
+- [x] Create a VM template with our appropriate settings.
 - [x] Create a VM instance in our client's region.
-- [x] Setup SSH connection through gcloud CLI
-- [x] Setup Repo
-- [x] Create Readme capturing core knowledge documentation
-- [x] Create checklist connected to the Readme
-- [x] setup env, gitignore, gcloudignore
-- [ ] GCP Compute Structure Questions
-  - [ ] Do we want a Docker Container automatically set in Instance & Template
+- [x] Setup SSH connection through gcloud CLI.
+- [x] Setup Repo.
+- [x] Create Readme capturing core knowledge documentation.
+- [x] Create checklist connected to the Readme.
+- [x] setup env, gitignore, gcloudignore.
+- [ ] GCP Compute Structure Questions.
+  - [ ] Do we want a Docker Container automatically set in Instance & Template.
   - [ ] Do we want a startup script to install packages?
   - [ ] Do we just install packages, and know they will be there on load up?
-- [x] Setup initial application structure
+- [x] Setup initial application structure.
 
 ### Application
 
 - [x] Have a copy of what worked in other App when running locally.
 - [x] Create proof of life `/hello` route.
-- [ ] Design for API
+- [ ] Design for API.
   - [x] Implement API Exceptions
+- [ ] Install chrome browser in this application.
+- [x] Install bs4 (Beautiful Soup)
 - [ ] Refactor local App technique to work in this environment.
 - [ ] Can save to a static files bucket that can be used by other application.
 - [ ] Can be triggered by other application calling an API route.
