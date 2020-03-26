@@ -1,7 +1,5 @@
 """ Original Attempts from a different project running this inside a Flask app. """
 from flask import flash, current_app as app
-# from phantomjs import Phantom
-from phantomjs_bin import executable_path
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 import time
@@ -10,13 +8,15 @@ from os import path
 from pprint import pprint
 # import json
 
-# phantom = Phantom()
-location = 'application/save/'
+location = 'save/'
 URL = app.config.get('URL')
 
 
 def phantom_grab(ig_url, filename):
     """ Using selenium webdriver with phantom js and grabing the file from the page content. """
+    # from phantomjs import Phantom
+    from phantomjs_bin import executable_path
+
     filepath = location + filename
     driver = webdriver.PhantomJS(executable_path=executable_path)
     app.logger.info("==============================================")
@@ -144,11 +144,11 @@ def soup_no_chrome(ig_url, filename):
     return answer
 
 
-def capture(post, filename):
+def capture(post=None, filename='screenshot'):
     """ Visits the permalink for give Post, creates a screenshot named the given filename. """
-    ig_url = post.permalink
-    # answer = chrome_grab(ig_url, filename)
-    answer = phantom_grab(ig_url, filename)
+    ig_url = post.permalink if post else 'https://www.instagram.com/p/B4dQzq8gukI/'
+    answer = chrome_grab(ig_url, filename)
+    # answer = phantom_grab(ig_url, filename)
     # answer = soup_no_chrome(ig_url, filename)
     return answer
 
