@@ -2,20 +2,20 @@
 
 ## Milestones
 
-| Complete           | Task                                         |
-| ------------------ |:--------------------------------------------:|
-|                    | **Setup**                                    |
+| Complete           | Task                                                  |
+| ------------------ |:-----------------------------------------------------:|
+|                    | **Setup**                                             |
 | :heavy_check_mark: | Template and Instance settings researched and created |
-| :heavy_check_mark: | Repo created, initial readme, ignore files, env |
-|                    | Selenium and Browser packages/docker setup |
-|                    | Basic application structure setup & `/hello` route. |
-|                    | **Milestone 1 Completion**                    |
-|                    | Can visit a given url and save a screenshot  |
-|                    | Can navigate and capture each desired image  |
-|                    | Captured images saved to bucket for other app use |
-|                    | Can be triggered via an API route |
-|                    | API can accept url and storage location parameters |
-|                    | **March 2020 Features Completed**            |
+| :heavy_check_mark: | Repo created, initial readme, ignore files, env       |
+|                    | Selenium and Browser packages/docker setup            |
+|                    | Basic application structure setup & `/hello` route.   |
+|                    | **Milestone 1 Completion**                            |
+|                    | Can visit a given url and save a screenshot           |
+|                    | Can navigate and capture each desired image           |
+|                    | Captured images saved to bucket for other app use     |
+|                    | Can be triggered via an API route                     |
+|                    | API can accept url and storage location parameters    |
+|                    | **March 2020 Features Completed**                     |
 
 ## Checklist
 
