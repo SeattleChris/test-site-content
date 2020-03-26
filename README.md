@@ -40,13 +40,15 @@ The deployed site (see below) will accept the following routes and return an app
 
 [Deployed Site](https://www.bacchusinfluencerplatform.com)
 
-We are currently deploying on Google Cloud Platform (GCP), with the Google Compute Engine. The machine configuration is set for general-purpose, first generation - N1 (Intel Skylake CPU or predecessors), fi-micro type (shared core: 1vCPU, 614MB memory). The CPU platform is set to automatic, display device is turned on, and the boot disk is running the stable Container-Optimized OS (80-12739.104.0.stable), standard persistent disk of 10GB).
+We are currently deploying on Google Cloud Platform (GCP), with the Google Compute Engine. This is part of the Facebook Insights App. Based off of the template below, the compute engine instance is named `capture-content-1`. It is hosted in europe-west2 Region (London) and Zone: europe-west2-a
+
+VM Instance template named `capture-content` has the following settings. The machine configuration is set for general-purpose, first generation - N1 (Intel Skylake CPU or predecessors), fi-micro type (shared core: 1vCPU, 614MB memory). The CPU platform is set to automatic, display device is turned on, and the boot disk is a 10GB standard persistent disk running Ubuntu 18.04 LTS Minimal (Debian based Linux). Identity and API access is set to default Compute Engine service account (400949092475-compute@developer.gserviceaccount.com) with a scoop of default access (read-only to Storage & Service Management, write to Stackdriver Logging & Monitoring, read/write to Service Control) The firewall is set to allow HTTPS traffic (but not HTTP).
 
 ## Development Notes
 
-The GCP Compute Engine platform is for intalling and running containers. One solution might be to install a Linux OS container, and then install things on top of that as we are accustomed to doing as if it was a normal local machine. However, a better approach is to instantiate from Docker containers. We can make and host our own Docker Containers as needed. Where possible, it is best to utilize Docker Containers that are maintained by official sources.
+The GCP Compute Engine platform is for installing and running containers. One solution might be to install a Linux OS container, and then install things on top of that as we are accustomed to doing as if it was a normal local machine. However, a better approach is to instantiate from Docker containers. We can make and host our own Docker Containers as needed. Where possible, it is best to utilize Docker Containers that are maintained by official sources.
 
-
+[Tasks & Checklist](./checklist.md)
 
 ## Potential Resources
 
