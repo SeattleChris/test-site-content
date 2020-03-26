@@ -16,6 +16,7 @@ def create_app(config, testing=False, config_overrides=None):
     # Setup the data model.
     with app.app_context():
         from . import routes  # noqa: F401
+        from . import errors  # noqa: F401
 
     # TODO: For production, the output of the error should be disabled.
     @app.errorhandler(500)
