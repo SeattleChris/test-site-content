@@ -6,7 +6,6 @@ from os import environ
 SECRET_KEY = environ.get('SECRET_KEY')  # for session cookies & flash messages
 FLASK_APP = environ.get('FLASK_APP')
 FLASK_ENV = environ.get('FLASK_ENV')
-DEBUG = environ.get('DEBUG') == 'True'
 PROJECT_NAME = environ.get('PROJECT_NAME')
 PROJECT_ID = environ.get('PROJECT_ID')
 PROJECT_NUMBER = environ.get('PROJECT_NUMBER')

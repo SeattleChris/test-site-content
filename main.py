@@ -1,5 +1,7 @@
+from dotenv import load_dotenv
 import config
 import application
+load_dotenv()
 
 
 app = application.create_app(config)

@@ -11,6 +11,7 @@ chromedriver-binary = "*"
 selenium = "*"
 simplejson = "*"
 bs4 = "*"
+python-dotenv = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"
