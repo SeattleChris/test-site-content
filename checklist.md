@@ -46,6 +46,8 @@ Current Status:
   - [ ] Do we want a Docker Container automatically set in Instance & Template.
   - [ ] Do we want a startup script to install packages?
   - [ ] Do we just install packages, and know they will be there on load up?
+    - [ ] Seems complicated in maintaining the code up to date.
+    - [ ] Get an exposed route for other apps
 - [x] Setup initial application structure.
 
 ### Application
