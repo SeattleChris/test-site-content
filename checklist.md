@@ -29,7 +29,7 @@
 - [s] Stretch Goal. Not for current feature plan.
 
 Current Status:
-2020-03-26 15:21:20
+2020-03-27 00:22:54
 <!-- Ctrl-Shift-I to generate timestamp -->
 
 ### Setup
@@ -44,9 +44,17 @@ Current Status:
 - [x] setup env, gitignore, gcloudignore.
 - [ ] GCP Compute Structure Questions.
   - [ ] Do we want a Docker Container automatically set in Instance & Template.
-  - [ ] Do we want a startup script to install packages?
+    - [x] VM instance: `capture-content-2`
+    - [x] Start with selenium and standalone chrome
+    - [ ] Add container for our specific code.
+    - [ ] connect all the code together and get hello world locally
+    - [ ] Expose a route to call the function.
+    - [ ] connect all in VM and get hello world through exposed route
+    - [ ] Create and use a startup script, if needed.
+  - [ ] Do we want a startup script to install packages and start process?
   - [ ] Do we just install packages, and know they will be there on load up?
-    - [ ] Seems complicated in maintaining the code up to date.
+    - [x] VM instance: `capture-content-1`
+    - [x] Seems complicated in maintaining the code up to date.
     - [ ] Get an exposed route for other apps
 - [x] Setup initial application structure.
 
@@ -58,7 +66,12 @@ Current Status:
   - [x] Implement API Exceptions
 - [ ] Install chrome browser in this application.
   - [x] Directly on server when ssh in.
+  - [ ] As a container
+  - [ ] ? As part of a startup script?
 - [x] Install bs4 (Beautiful Soup)
+- [ ] See if it can be done without Beautiful Soup.
+  - [ ] Different techniques to get that same data.
+  - [ ] uninstall bs4, update requirements.
 - [ ] Refactor local App technique to work in this environment.
 - [ ] Can save to a static files bucket that can be used by other application.
 - [ ] Can be triggered by other application calling an API route.
