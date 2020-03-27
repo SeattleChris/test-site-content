@@ -1,5 +1,6 @@
-from flask import request, current_app as app
-# from flask import render_template, redirect, url_for, request, flash  # , abort
+from flask import request, render_template, current_app as app
+from .capture import capture
+# from flask import redirect, url_for, request, flash
 import simplejson as json
 
 
@@ -15,5 +16,12 @@ def home():
 @app.route('/hello')
 def hello():
     return 'Hello World!'
+
+
+@app.route('/test')
+def test():
+    answer = capture()
+    return render_template('base.html', result=answer)
+
 
 # end of routes.py file

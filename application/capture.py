@@ -61,6 +61,7 @@ def chrome_grab(ig_url, filename):
     options.add_argument('--headless')
     options.add_argument("--remote-debugging-port=9222")
     options.binary_location = chromedriver_binary.chromedriver_filename
+    # chrome_executable_path = '/usr/bin/google-chrome'
     driver = webdriver.Chrome(chrome_options=options)
 
     app.logger.info("==============================================")
@@ -91,6 +92,7 @@ def chrome_grab(ig_url, filename):
     flash(message)
     answer = f"{URL}/{filepath}_full.png" if success else f"Failed. See flash messages above. "
     driver.close()
+    # driver.quit()  # Needed?
     # driver.exit()  # Needed?
     return answer
 

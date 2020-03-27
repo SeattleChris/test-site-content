@@ -55,6 +55,7 @@ Current Status:
 - [ ] Design for API.
   - [x] Implement API Exceptions
 - [ ] Install chrome browser in this application.
+  - [x] Directly on server when ssh in.
 - [x] Install bs4 (Beautiful Soup)
 - [ ] Refactor local App technique to work in this environment.
 - [ ] Can save to a static files bucket that can be used by other application.
