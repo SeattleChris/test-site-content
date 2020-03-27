@@ -1,7 +1,5 @@
 """ Original Attempts from a different project running this inside a Flask app. """
 from flask import flash, current_app as app
-# from phantomjs import Phantom
-from phantomjs_bin import executable_path
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 import time
@@ -10,13 +8,15 @@ from os import path
 from pprint import pprint
 # import json
 
-# phantom = Phantom()
-location = 'application/save/'
+location = 'save/'
 URL = app.config.get('URL')
 
 
 def phantom_grab(ig_url, filename):
     """ Using selenium webdriver with phantom js and grabing the file from the page content. """
+    # from phantomjs import Phantom
+    from phantomjs_bin import executable_path
+
     filepath = location + filename
     driver = webdriver.PhantomJS(executable_path=executable_path)
     app.logger.info("==============================================")
@@ -61,6 +61,7 @@ def chrome_grab(ig_url, filename):
     options.add_argument('--headless')
     options.add_argument("--remote-debugging-port=9222")
     options.binary_location = chromedriver_binary.chromedriver_filename
+    # chrome_executable_path = '/usr/bin/google-chrome'
     driver = webdriver.Chrome(chrome_options=options)
 
     app.logger.info("==============================================")
@@ -91,6 +92,7 @@ def chrome_grab(ig_url, filename):
     flash(message)
     answer = f"{URL}/{filepath}_full.png" if success else f"Failed. See flash messages above. "
     driver.close()
+    # driver.quit()  # Needed?
     # driver.exit()  # Needed?
     return answer
 
@@ -144,11 +146,11 @@ def soup_no_chrome(ig_url, filename):
     return answer
 
 
-def capture(post, filename):
+def capture(post=None, filename='screenshot'):
     """ Visits the permalink for give Post, creates a screenshot named the given filename. """
-    ig_url = post.permalink
-    # answer = chrome_grab(ig_url, filename)
-    answer = phantom_grab(ig_url, filename)
+    ig_url = post.permalink if post else 'https://www.instagram.com/p/B4dQzq8gukI/'
+    answer = chrome_grab(ig_url, filename)
+    # answer = phantom_grab(ig_url, filename)
     # answer = soup_no_chrome(ig_url, filename)
     return answer
 

@@ -142,6 +142,8 @@ $RECYCLE.BIN/
 *.lnk
 # End of https://www.gitignore.io/api/linux,macos,python,windows
 
+# Linux Debian packages
+*.deb
 # Env and personal notes.
 notes.md
 .vscode
