@@ -53,16 +53,16 @@ def phantom_grab(ig_url, filename):
 
 def chrome_grab(ig_url, filename):
     """ Using selenium webdriver with Chrome and grabing the file from the page content. """
-    import chromedriver_binary  # Adds chromedriver binary to path
+    # import chromedriver_binary  # Adds chromedriver binary to path
     filepath = location + filename
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--headless')
     options.add_argument("--remote-debugging-port=9222")
-    options.binary_location = chromedriver_binary.chromedriver_filename
+    # options.binary_location = chromedriver_binary.chromedriver_filename
     # chrome_executable_path = '/usr/bin/google-chrome'
-    driver = webdriver.Chrome(chrome_options=options)
+    driver = webdriver.Chrome('~/test-site-content/chromedriver', chrome_options=options)
 
     app.logger.info("==============================================")
     driver.get(ig_url)
