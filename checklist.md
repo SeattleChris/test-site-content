@@ -42,6 +42,9 @@ Current Status:
 - [x] Create Readme capturing core knowledge documentation.
 - [x] Create checklist connected to the Readme.
 - [x] setup env, gitignore, gcloudignore.
+- [ ] Use Cloud Functions?
+  - [n] Can Chrome run on Cloud Functions.
+  - [ ] Used as trigger or interface to Engine.
 - [ ] GCP Compute Structure Questions.
   - [ ] Do we want a Docker Container automatically set in Instance & Template.
     - [x] VM instance: `capture-content-2`

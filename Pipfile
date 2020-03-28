@@ -11,6 +11,7 @@ selenium = "*"
 simplejson = "*"
 bs4 = "*"
 python-dotenv = "*"
+pyopenssl = "*"
 
 [requires]
 python_version = "3.6"

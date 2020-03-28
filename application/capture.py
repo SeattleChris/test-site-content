@@ -62,7 +62,7 @@ def chrome_grab(ig_url, filename):
     options.add_argument("--remote-debugging-port=9222")
     # options.binary_location = chromedriver_binary.chromedriver_filename
     # chrome_executable_path = '/usr/bin/google-chrome'
-    driver = webdriver.Chrome('chromedriver', chrome_options=options)
+    driver = webdriver.Chrome('~/test-site-content/chromedriver', chrome_options=options)
 
     app.logger.info("==============================================")
     driver.get(ig_url)
