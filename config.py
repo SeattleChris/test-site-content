@@ -16,7 +16,7 @@ INSTANCE_NAME = environ.get('INSTANCE_NAME')
 INSTANCE_ID = environ.get('INSTANCE_ID')
 SERVICE_ACCOUNT = environ.get('SERVICE_ACCOUNT')
 DEPLOYED_URL = environ.get('DEPLOYED_URL', '')
-LOCAL_URL = 'http://127.0.0.1:8080'
+LOCAL_URL = 'http://0.0.0.0:8080'
 if environ.get('COMPUTE_INSTANCE', None):
     PREFERRED_URL_SCHEME = 'https'
     FLASK_RUN_CERT = 'adhoc'
