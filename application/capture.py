@@ -16,9 +16,12 @@ def phantom_grab(ig_url, filename):
 
     driver = webdriver.PhantomJS(executable_path=executable_path)
     app.logger.info("==============================================")
+    files, message = [], ''
     driver.get(ig_url)
-    success = driver.save_screenshot(f"{filename}_full.png")
+    temp = f"{filename}_full.png"
+    success = driver.save_screenshot(temp)
     count = 0 if success else -1
+    files.append(temp)
     app.logger.debug(f"Start of count at {count + 1}. ")
     soup = bs(driver.page_source, 'html.parser')
     # TODO: Determine if we can do this without BeautifulSoup processes.
@@ -30,18 +33,16 @@ def phantom_grab(ig_url, filename):
         try:
             driver.get(ea)
             temp = f"{filename}_{count}.png"
-            app.logger.debug(temp)
+            files.append(temp)
             driver.save_screenshot(temp)
         except Exception as e:
-            message = f"Error on file # {count} . "
-            app.logger.error(message)
+            temp = f"Error on file # {count} . "
+            message += temp
             app.logger.exception(e)
-            flash(message)
     success = count == len(target)
-    message = 'Files Saved! ' if success else "Error in Screen Grab. "
+    message += 'Files Saved! ' if success else "Error in Screen Grab. "
     app.logger.debug(message)
-    flash(message)
-    answer = f"{filename}_full.png" if success else f"Failed. See flash messages above. "
+    answer = {'success': success, 'message': message, 'file_list': files}
     driver.close()
     # driver.exit()  # Needed?
     return answer
@@ -58,36 +59,35 @@ def chrome_grab(ig_url, filename):
     # options.binary_location = chromedriver_binary.chromedriver_filename
     # chrome_executable_path = '/usr/bin/google-chrome'
     # chromedriver_path = 'chromedriver' if app.config.get('LOCAL_ENV') else 'chromedriver'
-
     driver = webdriver.Chrome('chromedriver', chrome_options=options)
-
     app.logger.info("==============================================")
+    files, message = [], ''
     driver.get(ig_url)
-    success = driver.save_screenshot(f"{filename}_full.png")
+    temp = f"{filename}_full.png"
+    success = driver.save_screenshot(temp)
+    error_count = 0 if success else 1
     count = 0 if success else -1
+    files.append(temp)
     app.logger.debug(f"Start of count at {count + 1}. ")
     soup = bs(driver.page_source, 'html.parser')
     # TODO: Determine if we can do this without BeautifulSoup processes.
     target = [img.get('src') for img in soup.findAll('img') if not re.search("^\/", img.get('src'))]
-    pprint(target)
     for ea in target:
         count += 1
         time.sleep(1)
         try:
             driver.get(ea)
             temp = f"{filename}_{count}.png"
-            app.logger.debug(temp)
+            files.append(temp)
             driver.save_screenshot(temp)
         except Exception as e:
-            message = f"Error on file # {count} . "
-            app.logger.error(message)
+            message += f"Error on file # {count} . "
+            error_count += 1
             app.logger.exception(e)
-            flash(message)
-    success = count == len(target)
-    message = 'Files Saved! ' if success else "Error in Screen Grab. "
+    success = error_count == 0
+    message += 'Files Saved! ' if success else "Error in Screen Grab. "
     app.logger.debug(message)
-    flash(message)
-    answer = f"{filename}_full.png" if success else f"Failed. See flash messages above. "
+    answer = {'success': success, 'message': message, 'file_list': files}
     driver.close()
     # driver.quit()  # Needed?
     # driver.exit()  # Needed?
