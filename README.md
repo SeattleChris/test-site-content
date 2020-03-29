@@ -9,32 +9,37 @@ Used to confirm the expected content was published and available online at a giv
 
 Designed to be deployed on Google Cloud App Engine, using:
 
-- TBA
-- TBA
-
 Core packages required for this application:
 
+- Flask
 - Selenium
-- Chrome
-- Chromedriver
 - ? bs4 and Beautiful Soup
+
+Infrastructure and Installed Programs (not as packages):
+
+- Linux (currently Ubuntu 18.04 LTS)
+- Chrome (ver 80.0.3987.149)
+- Chromedriver (ver 2.41.578700, for Chrome 80.0.3987.??)
 
 Possibly needed:
 
-- ? flask
-- ? gunicorn
-- ? google-api-python-client
-- ? google-auth-httplib2
-- ? google-auth
-- ? requests-oauthlib
+- pyopenssl
+- python-dotenv
+- simplejson
+- gunicorn
+- requests (for dev only)
 
 ## API
 
 The deployed site (see below) will accept the following routes and return an appropriate JSON response.
 
-| Route              | Feature                                      | Response Example
-|:------------------:|:--------------------------------------------:|:------------------:|
-| /hello             | Proof of life response                       | {'success': true } |
+API Route: /api/v1/post/[id]/[media_type]/[media_id]/?url=[url-to-test-for-images]
+
+Where [id] is a unique integer approved for associating for this specific post being analyzed for this job. The [id], [media_type] and [media_id] all correspond to the properties of the associated post, as understood in the client's application.
+
+Response: {'success': [bool], 'message': [string], 'file_list': [list]}
+
+Where `success` is True or False, representing if all the targeted images were found and recorded. The `file_list` is a list of strings representing the saved images for this job. The `message` is a string with additional information about this job.
 
 ## Deployment Settings
 

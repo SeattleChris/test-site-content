@@ -15,13 +15,13 @@ PROJECT_REGION = environ.get('PROJECT_REGION')
 INSTANCE_NAME = environ.get('INSTANCE_NAME')
 INSTANCE_ID = environ.get('INSTANCE_ID')
 SERVICE_ACCOUNT = environ.get('SERVICE_ACCOUNT')
-DEPLOYED_URL = environ.get('DEPLOYED_URL')
-LOCAL_URL = 'http://127.0.0.1:8080'
-PREFERRED_URL_SCHEME = 'https'
-if environ.get('GAE_INSTANCE'):
+DEPLOYED_URL = environ.get('DEPLOYED_URL', '')
+LOCAL_URL = 'http://0.0.0.0:8080'
+if environ.get('COMPUTE_INSTANCE', None):
+    PREFERRED_URL_SCHEME = 'https'
+    FLASK_RUN_CERT = 'adhoc'
     URL = DEPLOYED_URL
     LOCAL_ENV = False
 else:
-    environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
     URL = LOCAL_URL
     LOCAL_ENV = True

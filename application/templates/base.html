@@ -18,6 +18,7 @@
       <li><a href="{{ url_for('home') }}">Home</a></li>
       <li><a href="{{ url_for('hello') }}">Hello</a></li>
       <li><a href="{{ url_for('test') }}">Test</a></li>
+      <li><a href="{{ url_for('call') }}">Call</a></li>
     </ul>
   </nav>
 {% endblock header %}
@@ -44,7 +45,8 @@
 <footer>
   <p>
     <a href="{{ url_for('home')}}">Home</a> |
-    <a href="{{ url_for('test') }}">Test</a>
+    <a href="{{ url_for('test') }}">Test</a> |
+    <a href="{{ url_for('call') }}">Call</a>
   </p>
 </footer>
 </body>
