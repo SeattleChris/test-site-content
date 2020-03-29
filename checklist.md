@@ -10,10 +10,11 @@
 | :heavy_check_mark: | Selenium and Browser packages/docker setup            |
 | :heavy_check_mark: | Basic application structure setup & `/hello` route.   |
 |                    | **Milestone 1 Completion**                            |
-|                    | Can visit a given url and save a screenshot           |
-|                    | Can navigate and capture each desired image           |
+| :heavy_check_mark: | Can visit a given url and save a screenshot           |
+| :heavy_check_mark: | Can navigate and capture each desired image           |
+| :heavy_check_mark: | Can be triggered via an API route                     |
 |                    | Captured images saved to bucket for other app use     |
-|                    | Can be triggered via an API route                     |
+|                    | API usage is limited to authorized use.               |
 |                    | API can accept url and storage location parameters    |
 |                    | **March 2020 Features Completed**                     |
 
@@ -29,7 +30,7 @@
 - [s] Stretch Goal. Not for current feature plan.
 
 Current Status:
-2020-03-27 00:22:54
+2020-03-28 22:58:54
 <!-- Ctrl-Shift-I to generate timestamp -->
 
 ### Setup
@@ -48,34 +49,41 @@ Current Status:
 - [ ] GCP Compute Structure Questions.
   - [ ] Do we want a Docker Container automatically set in Instance & Template.
     - [x] VM instance: `capture-content-2`
-    - [x] Start with selenium and standalone chrome
+    - [x] Start with selenium and standalone chrome.
     - [ ] Add container for our specific code.
-    - [ ] connect all the code together and get hello world locally
-    - [ ] Expose a route to call the function.
-    - [ ] connect all in VM and get hello world through exposed route
-    - [ ] Create and use a startup script, if needed.
+    - [ ] can get it connected and exposed route running on GCP.
+    - [?] Create and use a startup script, if needed.
   - [ ] Do we want a startup script to install packages and start process?
   - [ ] Do we just install packages, and know they will be there on load up?
-    - [x] VM instance: `capture-content-1`
+    - [x] VM instance: `capture-content-1` .
     - [x] Seems complicated in maintaining the code up to date.
-    - [ ] Get an exposed route for other apps
+    - [x] Get an exposed route for other apps.
 - [x] Setup initial application structure.
 
 ### Application
 
 - [x] Have a copy of what worked in other App when running locally.
 - [x] Create proof of life `/hello` route.
-- [ ] Design for API.
-  - [x] Implement API Exceptions
-- [ ] Install chrome browser in this application.
+- [x] Install (not as packages) chrome browser in this application.
+- [x] Install needed packages: Flask, Selenium, bs4 (Beautiful Soup), etc.
+- [x] Determine and install the appropriate chromedriver.
+- [x] Design for API.
+  - [x] Implement API Exceptions.
+  - [x] Give a JSON Response.
+  - [x] Document the API in the Readme.
+- [x] connect all in VM and get hello world through exposed route.
+- [x] Expose a route and test API with known and dummy values.
   - [x] Directly on server when ssh in.
-  - [ ] As a container
-  - [ ] ? As part of a startup script?
-- [x] Install bs4 (Beautiful Soup)
+  - [?] As a container.
+  - [?] ? As part of a startup script?
 - [ ] See if it can be done without Beautiful Soup.
   - [ ] Different techniques to get that same data.
   - [ ] uninstall bs4, update requirements.
-- [ ] Refactor local App technique to work in this environment.
+- [x] Refactor local App technique to work in this environment.
 - [ ] Can save to a static files bucket that can be used by other application.
-- [ ] Can be triggered by other application calling an API route.
+- [x] Can be triggered by other application calling an API route.
 - [ ] API can accept parameters for url and storage location.
+- [ ] API usage is limited to authorized use.
+  - [?] Only works via backend routes?
+  - [?] Utilize authorization set up via Google Cloud Platform.
+  - [?] Set up authorization API keys
