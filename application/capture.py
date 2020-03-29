@@ -8,20 +8,16 @@ from os import path
 from pprint import pprint
 # import json
 
-location = 'save/'
-URL = app.config.get('URL')
-
 
 def phantom_grab(ig_url, filename):
     """ Using selenium webdriver with phantom js and grabing the file from the page content. """
     # from phantomjs import Phantom
     from phantomjs_bin import executable_path
 
-    filepath = location + filename
     driver = webdriver.PhantomJS(executable_path=executable_path)
     app.logger.info("==============================================")
     driver.get(ig_url)
-    success = driver.save_screenshot(f"{filepath}_full.png")
+    success = driver.save_screenshot(f"{filename}_full.png")
     count = 0 if success else -1
     app.logger.debug(f"Start of count at {count + 1}. ")
     soup = bs(driver.page_source, 'html.parser')
@@ -33,7 +29,7 @@ def phantom_grab(ig_url, filename):
         time.sleep(1)
         try:
             driver.get(ea)
-            temp = f"{filepath}_{count}.png"
+            temp = f"{filename}_{count}.png"
             app.logger.debug(temp)
             driver.save_screenshot(temp)
         except Exception as e:
@@ -45,7 +41,7 @@ def phantom_grab(ig_url, filename):
     message = 'Files Saved! ' if success else "Error in Screen Grab. "
     app.logger.debug(message)
     flash(message)
-    answer = f"{URL}/{filepath}_full.png" if success else f"Failed. See flash messages above. "
+    answer = f"{filename}_full.png" if success else f"Failed. See flash messages above. "
     driver.close()
     # driver.exit()  # Needed?
     return answer
@@ -54,7 +50,6 @@ def phantom_grab(ig_url, filename):
 def chrome_grab(ig_url, filename):
     """ Using selenium webdriver with Chrome and grabing the file from the page content. """
     # import chromedriver_binary  # Adds chromedriver binary to path
-    filepath = location + filename
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
@@ -62,11 +57,13 @@ def chrome_grab(ig_url, filename):
     options.add_argument("--remote-debugging-port=9222")
     # options.binary_location = chromedriver_binary.chromedriver_filename
     # chrome_executable_path = '/usr/bin/google-chrome'
-    driver = webdriver.Chrome('~/test-site-content/chromedriver', chrome_options=options)
+    # chromedriver_path = 'chromedriver' if app.config.get('LOCAL_ENV') else 'chromedriver'
+
+    driver = webdriver.Chrome('chromedriver', chrome_options=options)
 
     app.logger.info("==============================================")
     driver.get(ig_url)
-    success = driver.save_screenshot(f"{filepath}_full.png")
+    success = driver.save_screenshot(f"{filename}_full.png")
     count = 0 if success else -1
     app.logger.debug(f"Start of count at {count + 1}. ")
     soup = bs(driver.page_source, 'html.parser')
@@ -78,7 +75,7 @@ def chrome_grab(ig_url, filename):
         time.sleep(1)
         try:
             driver.get(ea)
-            temp = f"{filepath}_{count}.png"
+            temp = f"{filename}_{count}.png"
             app.logger.debug(temp)
             driver.save_screenshot(temp)
         except Exception as e:
@@ -90,7 +87,7 @@ def chrome_grab(ig_url, filename):
     message = 'Files Saved! ' if success else "Error in Screen Grab. "
     app.logger.debug(message)
     flash(message)
-    answer = f"{URL}/{filepath}_full.png" if success else f"Failed. See flash messages above. "
+    answer = f"{filename}_full.png" if success else f"Failed. See flash messages above. "
     driver.close()
     # driver.quit()  # Needed?
     # driver.exit()  # Needed?
@@ -103,7 +100,6 @@ def soup_no_chrome(ig_url, filename):
     """
     import requests
     import urllib.request
-    filepath = location + filename
 
     def _get_images(ig_url, filename):
         """ Helper function to traverse and capture image files.
@@ -128,7 +124,7 @@ def soup_no_chrome(ig_url, filename):
             if ext:
                 # extension = 'png'  # example, but actually set according to a.
                 #   a) set the output filename to have the same file extension as original file.
-                urllib.request.urlretrieve(image, f"{filepath}_{file_count}.{ext}")
+                urllib.request.urlretrieve(image, f"{filename}_{file_count}.{ext}")
             else:
                 # 3) if no file extension or doesn't match known extensions, assume a web page view.
                 recur_goal, recur_found = _get_images(image, f"filename_{file_count}")
@@ -142,13 +138,14 @@ def soup_no_chrome(ig_url, filename):
     message = 'Files Saved! ' if success else "Error in Capture(s). "
     app.logger.debug(message)
     flash(message)
-    answer = f"{URL}/{filepath}" if success else f"Failed. {success} "
+    answer = f"{filename}" if success else f"Failed. {success} "
     return answer
 
 
-def capture(post=None, filename='screenshot'):
+def capture(url=None, post=None, filename='screenshot'):
     """ Visits the permalink for give Post, creates a screenshot named the given filename. """
     ig_url = post.permalink if post else 'https://www.instagram.com/p/B4dQzq8gukI/'
+    ig_url = url or ig_url
     answer = chrome_grab(ig_url, filename)
     # answer = phantom_grab(ig_url, filename)
     # answer = soup_no_chrome(ig_url, filename)
