@@ -37,9 +37,14 @@ API Route: /api/v1/post/[id]/[media_type]/[media_id]/?url=[url-to-test-for-image
 
 Where [id] is a unique integer approved for associating for this specific post being analyzed for this job. The [id], [media_type] and [media_id] all correspond to the properties of the associated post, as understood in the client's application.
 
-Response: {'success': [bool], 'message': [string], 'file_list': [list]}
+JSON Response has the following properties:
 
-Where `success` is True or False, representing if all the targeted images were found and recorded. The `file_list` is a list of strings representing the saved images for this job. The `message` is a string with additional information about this job.
+- `success`: True or False, if all the targeted images were found and recorded.
+- `url`: a string for where the files are saved, currently a local file directory.
+- `file_list`: a list of strings representing the saved images for this job.
+- `message`: a string with additional information about this job.
+- `saved_media`: reserved, but not present in the response.
+- `post_model`: reserved, but not present in the response.
 
 ## Deployment Settings
 

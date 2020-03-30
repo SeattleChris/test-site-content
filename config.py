@@ -19,7 +19,6 @@ DEPLOYED_URL = environ.get('DEPLOYED_URL', '')
 LOCAL_URL = 'http://0.0.0.0:8080'
 if environ.get('COMPUTE_INSTANCE', None):
     PREFERRED_URL_SCHEME = 'https'
-    FLASK_RUN_CERT = 'adhoc'
     URL = DEPLOYED_URL
     LOCAL_ENV = False
 else:

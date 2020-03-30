@@ -87,9 +87,9 @@ def api(id, media_type, media_id):
     answer = capture(url=ig_url, filename=filename)
     app.logger.debug('---------- Capture gave us an answer ----------')
     app.logger.debug(answer)
+    answer['url'] = path  # TODO: Update when saving to Bucket.
     app.logger.debug('------------ We can jsonify it --------------')
-    temp = jsonify(answer)
-    app.logger.debug(temp)
+    app.logger.debug(jsonify(answer))
     return jsonify(answer)
 
 
