@@ -85,6 +85,9 @@ Current Status:
 - [ ] After images are stored in accessible location, `url` represents the location.
 - [ ] Can save to a static files bucket that can be used by other application.
 - [x] Can be triggered by other application calling an API route.
+- [ ] URGENT Fix HTTPS self signing error.
+  - [ ] See readme link to `Apps to instances`
+  - [ ] Also see readme link to `VPC Firewall`
 - [ ] API can accept parameters for url and storage location.
 - [ ] API usage is limited to authorized use.
   - [?] Only works via backend routes?
