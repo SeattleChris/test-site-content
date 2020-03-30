@@ -70,6 +70,8 @@ A Compute Engine on GCP handles its connections via Firewall Rules. It seems it 
 Google Cloud Platform Documentation:
 
 - [App on Compute](https://cloud.google.com/python/tutorials/getting-started-on-compute-engine)
+- [Apps to instances](https://cloud.google.com/compute/docs/tutorials/service-account-ssh)
+- [VPC Firewall](https://cloud.google.com/vpc/docs/using-firewalls)
 - [Compute Docs](https://cloud.google.com/compute/docs)
 - [LAMP on GCE](https://cloud.google.com/community/tutorials/setting-up-lamp#setting-up-dns)
 - [GCE Containers](https://cloud.google.com/compute/docs/containers/deploying-containers)
