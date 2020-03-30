@@ -30,7 +30,7 @@
 - [s] Stretch Goal. Not for current feature plan.
 
 Current Status:
-2020-03-28 22:58:54
+2020-03-29 20:07:54
 <!-- Ctrl-Shift-I to generate timestamp -->
 
 ### Setup
@@ -80,6 +80,9 @@ Current Status:
   - [ ] Different techniques to get that same data.
   - [ ] uninstall bs4, update requirements.
 - [x] Refactor local App technique to work in this environment.
+- [x] Returns a JSON Response with `success` boolean, and other information.
+- [x] Returns a JSON Response with `url` string of where the file is stored.
+- [ ] After images are stored in accessible location, `url` represents the location.
 - [ ] Can save to a static files bucket that can be used by other application.
 - [x] Can be triggered by other application calling an API route.
 - [ ] API can accept parameters for url and storage location.

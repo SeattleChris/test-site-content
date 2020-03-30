@@ -150,7 +150,3 @@ def capture(url=None, post=None, filename='screenshot'):
     # answer = phantom_grab(ig_url, filename)
     # answer = soup_no_chrome(ig_url, filename)
     return answer
-
-    # script = body.find('script', text=lambda t: t.startswith('window._sharedData'))
-    # page_json = script.text.split(' = ', 1)[1].rstrip(';')
-    # data = json.loads(page_json)
