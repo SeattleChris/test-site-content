@@ -58,7 +58,7 @@ VM Instance templates named `capture-content` and `capture-content-docker` have 
 
 The GCP Compute Engine platform is for installing and running containers. One solution might be to install a Linux OS container, and then install things on top of that as we are accustomed to doing as if it was a normal local machine. However, a better approach is to instantiate from Docker containers. We can make and host our own Docker Containers as needed. Where possible, it is best to utilize Docker Containers that are maintained by official sources.
 
-A Compute Engine on GCP handles its connections via Firewall Rules. It seems it cannot expose a public url path. They can connect to pull content from publically available resources. Other connection options include:
+A Compute Engine on GCP handles its connections via Firewall Rules. It seems it cannot expose a public url path. They can connect to pull content from publicly available resources. Other connection options include:
 
 1) Communicate within network, to other Compute Engine instances.
 2) App Engine Standard. VPC rules do not apply. Only GAE firewall rules apply to ingress.

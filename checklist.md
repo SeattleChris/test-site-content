@@ -13,8 +13,9 @@
 | :heavy_check_mark: | Can visit a given url and save a screenshot           |
 | :heavy_check_mark: | Can navigate and capture each desired image           |
 | :heavy_check_mark: | Can be triggered via an API route                     |
+|                    | API usage is limited to authorized use                |
+|                    | Continuously runs, app starts on server re-start      |
 |                    | Captured images saved to bucket for other app use     |
-|                    | API usage is limited to authorized use.               |
 |                    | API can accept url and storage location parameters    |
 |                    | **March 2020 Features Completed**                     |
 
@@ -30,10 +31,10 @@
 - [s] Stretch Goal. Not for current feature plan.
 
 Current Status:
-2020-03-29 20:07:54
+2020-03-31 15:24:26
 <!-- Ctrl-Shift-I to generate timestamp -->
 
-### Setup
+### Structure & Resources
 
 - [x] Initial research on Google Cloud Platform - Compute Engine.
 - [x] Create a VM template with our appropriate settings.
@@ -43,9 +44,13 @@ Current Status:
 - [x] Create Readme capturing core knowledge documentation.
 - [x] Create checklist connected to the Readme.
 - [x] setup env, gitignore, gcloudignore.
-- [ ] Use Cloud Functions?
+- [ ] ? Use Tasks or a queue system as entry point trigger to start task?
+- [n] Use Cloud Functions?
   - [n] Can Chrome run on Cloud Functions.
-  - [ ] Used as trigger or interface to Engine.
+  - [n] Used as trigger or interface to Engine.
+- [n] Use Cloud Run?
+  - [x] filesystem writes not persisted. Must save to Bucket.
+  - [?] No Chrome? "a container instance does not have any CPU available if it is not processing a request."
 - [ ] GCP Compute Structure Questions.
   - [ ] Do we want a Docker Container automatically set in Instance & Template.
     - [x] VM instance: `capture-content-2`
@@ -58,7 +63,14 @@ Current Status:
     - [x] VM instance: `capture-content-1` .
     - [x] Seems complicated in maintaining the code up to date.
     - [x] Get an exposed route for other apps.
+  - [ ] App always running.
+    - [x] Install screen.
+    - [ ] screen works to keep process running after logout.
+    - [ ] Startup script to start app works on server restart.
 - [x] Setup initial application structure.
+- [ ] Can be called by the platform application.
+  - [x] as an open route for an API call.
+  - [ ] through GCP using a service agent (more secure).
 
 ### Application
 
