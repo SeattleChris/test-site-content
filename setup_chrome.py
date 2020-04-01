@@ -77,6 +77,7 @@ def save_file_info(chrome, version, driver):
         f.write(f"CHROME_LOCATION={chrome}")
         f.write(f"CHROMEDRIVER_LOCATION={driver}")
         f.write('\n')
+    # TODO: Conditional or error catch?
     return env_filename
 
 
@@ -91,6 +92,15 @@ def get_or_install_program(program, install):
     return location
 
 
+def startup_process():
+    success = False
+    # pip3 install -r requirements.txt
+    # ... etc
+    # sudo apt-get install screen
+    # screen python3 main.py
+    return success
+
+
 if __name__ == '__main__':
     # update = subprocess.run("sudo apt update", shell=True)
     pip_info = get_or_install_program('pip3', True)
@@ -98,5 +108,6 @@ if __name__ == '__main__':
     chromedriver = get_chromedriver(version)
     saved_file = save_file_info(chrome, version, chromedriver)
     print(saved_file)
-    # pip3 install -r requirements.txt 
     print('Setup chrome done. ')
+    startup = startup_process()
+    print("Startup Done. ") if startup else print("Startup Incomplete. ")
