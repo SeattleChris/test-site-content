@@ -65,7 +65,7 @@ Current Status:
     - [x] Get an exposed route for other apps.
   - [ ] App always running.
     - [x] Install screen.
-    - [ ] screen works to keep process running after logout.
+    - [X] screen works to keep process running after logout.
     - [ ] Startup script to start app works on server restart.
 - [x] Setup initial application structure.
 - [ ] Can be called by the platform application.
