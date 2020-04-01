@@ -148,6 +148,7 @@ $RECYCLE.BIN/
 notes.md
 .vscode
 .env
+*.env
 /env
 .ENV
 .Env
