@@ -95,6 +95,7 @@ If hosting on Compute Engine (GCE):
 If hosting as App Engine - Flex environment (which is also GCE under the hood):
 
 - [GAE Flex yaml](https://cloud.google.com/appengine/docs/flexible/python/reference/app-yaml)
+- [GAE Flex setup](https://cloud.google.com/appengine/docs/flexible/python/runtime)
 - [SSH to GAE-Flex](https://cloud.google.com/appengine/docs/flexible/python/debugging-an-instance)
 
 Other Related Documentation:

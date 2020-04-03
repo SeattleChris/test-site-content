@@ -19,8 +19,8 @@ def get_chrome_info(browser):
     except Exception as e:
         print("Google Chrome needs to be installed. ")
         subprocess.check_output(f"wget {chrome_dl_url}/{chrome_deb_name}")
-        # subprocess.check_output(f"apt install ./{chrome_deb_name}")
-    output = subprocess.check_output(f"{browser} --version", stderr=subprocess.STDOUT, shell=True)
+        subprocess.check_output(f"sudo apt install ./{chrome_deb_name}")
+        output = subprocess.check_output(f"{browser} --version", stderr=subprocess.STDOUT, shell=True)
     version = output.rsplit(None, 1)[-1].rsplit(b'.', 1)[0].decode()
     try:
         chrome_location = subprocess.check_output(f"which {browser}", shell=True).decode()
@@ -43,7 +43,7 @@ def get_chromedriver(version):
         output = subprocess.check_output("chromedriver --version", stderr=subprocess.STDOUT, shell=True)
     except Exception as e:
         print("The chromedriver needs to be installed. ")
-        output = ''
+        output = b''
     local_ver = output.split()[1].decode()
     driver_location = None
     if ver == local_ver:
@@ -101,9 +101,12 @@ def startup_process():
     return success
 
 
-if __name__ == '__main__':
+def run_all():
+    """ All the steps we want to run at startup. """
     # update = subprocess.run("sudo apt update", shell=True)
-    pip_info = get_or_install_program('pip3', True)
+    pip_info = get_or_install_program('pip3', False)
+    print("Pip is installed at: ")
+    print(pip_info)
     chrome, version = get_chrome_info('google-chrome')
     chromedriver = get_chromedriver(version)
     saved_file = save_file_info(chrome, version, chromedriver)
@@ -111,3 +114,8 @@ if __name__ == '__main__':
     print('Setup chrome done. ')
     startup = startup_process()
     print("Startup Done. ") if startup else print("Startup Incomplete. ")
+    return
+
+
+if __name__ == '__main__':
+    run_all()

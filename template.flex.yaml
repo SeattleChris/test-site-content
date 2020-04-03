@@ -40,7 +40,7 @@ env_variables:
   PROJECT_ZONE: 'from-GCP-dashboard'
   PROJECT_CONNECTOR_NAME: 'from-GCP-connector-name'
   URL: 'https://[service_name]-dot-[PROJECT_ID].appspot.com'
-
+  DEV_RUN: 'False'
 # vpc_access_connector:
 #   name: "projects/[PROJECT_ID]/locations/[PROJECT_REGION]/connectors/[from-GCP-connector-name]"
 #
