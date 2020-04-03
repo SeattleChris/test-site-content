@@ -82,11 +82,11 @@ def api(id, media_type, media_id):
     path = os.path.join(path, str(id))
     try:
         os.mkdir(path)
-        filename = f"{path}/{media_type}"
+        filename = f"{path}/{media_type.lower()}"
     except FileExistsError as e:
         app.logger.debug(f"Error in test: Directory already exists at {path} ")
         app.logger.error(e)
-        filename = f"{path}/{media_type}_{media_id}"
+        filename = f"{path}/{media_type.lower()}_{str(media_id)}"
     except OSError as e:
         app.logger.debug(f"Error in test function creating dir {path}")
         app.logger.error(e)
