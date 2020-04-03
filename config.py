@@ -30,5 +30,6 @@ if any(deploy_options):
     URL = DEPLOYED_URL
     LOCAL_ENV = False
 else:
-    URL = 'http://0.0.0.0:8080'
+    # URL = 'http://127.0.0.1:8080'
+    URL = 'http://127.0.0.1:5000'
     LOCAL_ENV = True

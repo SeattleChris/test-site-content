@@ -23,6 +23,10 @@ def home():
 def hello():
     res = {'success': True, 'route': 'hello', 'answer': 'Hello World! '}
     res.update(app.config)
+    removed_val = res.pop('PERMANENT_SESSION_LIFETIME', 'NOT FOUND')
+    app.logger.debug(f"PERMANENT_SESSION_LIFETIME: {removed_val} ")
+    removed_val = res.pop('SEND_FILE_MAX_AGE_DEFAULT', 'NOT FOUND')
+    app.logger.debug(f"SEND_FILE_MAX_AGE_DEFAULT: {removed_val} ")
     app.logger.debug(json.dumps(res))
     app.logger.debug(BASE_DIR)
     return jsonify(res)
@@ -57,6 +61,9 @@ def call():
     media_id = 1369
     api_url = f"{url}/api/v1/post/{str(id)}/{media_type}/{str(media_id)}/"
     payload = {'url': test_ig}
+    app.logger.debug('========== Making a requests to our own API. ===========')
+    app.logger.debug(api_url)
+    app.logger.debug(payload)
     res = requests.get(api_url, params=payload)
     app.logger.debug('---------- Our Call got back: --------------------------')
     app.logger.debug(res.json())
