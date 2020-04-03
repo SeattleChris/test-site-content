@@ -68,6 +68,7 @@ def get_chromedriver(version):
             print(f"Chromedriver version {ver}. Unable to download. Visit url: ")
             print(f"{base_driver_url}/index.html?path={ver}/")
             return None
+        # TODO: We need to unzip it first!?!
         with open(chromedriver_filename, 'wb') as f:
             f.write(res.content)
     elif driver_location != chromedriver_filename:
