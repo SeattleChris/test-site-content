@@ -22,6 +22,7 @@ def home():
 @app.route('/hello')
 def hello():
     res = {'success': True, 'route': 'hello', 'answer': 'Hello World! '}
+    res.update(app.config)
     app.logger.debug(json.dumps(res))
     app.logger.debug(BASE_DIR)
     return jsonify(res)
