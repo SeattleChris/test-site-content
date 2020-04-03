@@ -1,10 +1,7 @@
 import config
 import application
-import setup_chrome
-
 
 app = application.create_app(config)
-setup_chrome.run_all()
 
 
 if __name__ == '__main__':

@@ -2,7 +2,6 @@ from os import environ
 # from dotenv import load_dotenv
 # load_dotenv()
 
-
 # class Config:
 #     """ Flask configuration variables """
 SECRET_KEY = environ.get('SECRET_KEY')  # for session cookies & flash messages

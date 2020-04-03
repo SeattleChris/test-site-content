@@ -2,12 +2,11 @@
 import subprocess
 import requests
 import os
-# from pprint import pprint
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 base_driver_url = 'https://chromedriver.storage.googleapis.com'
-chrome_dl_url = 'https://dl.google.com/linux/direct'
 chrome_deb_name = 'google-chrome-stable_current_amd64.deb'
+chrome_dl_url = f"https://dl.google.com/linux/direct/{chrome_deb_name}"
 chromedriver_filename = BASE_DIR + '/chromedriver'
 env_filename = BASE_DIR + '/chrome.env'
 lookup_package = {'pip3': 'python3-pip', }
@@ -18,8 +17,14 @@ def get_chrome_info(browser):
         output = subprocess.check_output(f"{browser} --version", stderr=subprocess.STDOUT, shell=True)
     except Exception as e:
         print("Google Chrome needs to be installed. ")
-        subprocess.check_output(f"wget {chrome_dl_url}/{chrome_deb_name}")
-        subprocess.check_output(f"sudo apt install ./{chrome_deb_name}")
+        # subprocess.check_output(f"wget {chrome_dl_url}")
+        chrome = requests.get(chrome_dl_url)
+        with open(chrome_deb_name, 'wb') as f:
+            f.write(chrome.content)
+        print("Google Chrome done writing file? ")
+        find_file = subprocess.check_output(f"ls *.deb", stderr=subprocess.STDOUT, shell=True)
+        print(find_file)
+        subprocess.check_output(f"sudo apt install ./{chrome_deb_name}", stderr=subprocess.STDOUT, shell=True)
         output = subprocess.check_output(f"{browser} --version", stderr=subprocess.STDOUT, shell=True)
     version = output.rsplit(None, 1)[-1].rsplit(b'.', 1)[0].decode()
     try:
@@ -104,16 +109,18 @@ def startup_process():
 def run_all():
     """ All the steps we want to run at startup. """
     # update = subprocess.run("sudo apt update", shell=True)
-    pip_info = get_or_install_program('pip3', False)
-    print("Pip is installed at: ")
-    print(pip_info)
+    # pip_info = get_or_install_program('pip3', False)
+    # print("Pip is installed at: ")
+    # print(pip_info)
+    print('==================== Setup Chrome ====================')
+    print(BASE_DIR)
     chrome, version = get_chrome_info('google-chrome')
     chromedriver = get_chromedriver(version)
     saved_file = save_file_info(chrome, version, chromedriver)
     print(saved_file)
     print('Setup chrome done. ')
-    startup = startup_process()
-    print("Startup Done. ") if startup else print("Startup Incomplete. ")
+    # startup = startup_process()
+    # print("Startup Done. ") if startup else print("Startup Incomplete. ")
     return
 
 
