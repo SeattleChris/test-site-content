@@ -23,8 +23,9 @@ def get_chrome_info(browser):
             f.write(chrome.content)
         print("Google Chrome done writing file? ")
         find_file = subprocess.check_output(f"ls *.deb", stderr=subprocess.STDOUT, shell=True)
-        print(find_file)
-        subprocess.check_output(f"sudo apt install ./{chrome_deb_name}", stderr=subprocess.STDOUT, shell=True)
+        print(find_file.decode())
+        install_chrome = subprocess.check_output(f"sudo dpkg -i --force-depends {chrome_deb_name}", stderr=subprocess.STDOUT, shell=True)
+        print(install_chrome)
         output = subprocess.check_output(f"{browser} --version", stderr=subprocess.STDOUT, shell=True)
     version = output.rsplit(None, 1)[-1].rsplit(b'.', 1)[0].decode()
     try:
