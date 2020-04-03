@@ -51,6 +51,11 @@ Current Status:
 - [n] Use Cloud Run?
   - [x] filesystem writes not persisted. Must save to Bucket.
   - [?] No Chrome? "a container instance does not have any CPU available if it is not processing a request."
+- [ ] App Engine - Flex Environment
+  - [ ] Can it install and run Chrome?
+  - [ ] Run startup script to check and install chrome only if needed.
+    - [ ] This may need to be done through metadata for the application?
+  - [ ] run as a service, and connect to other services (default, dev).
 - [ ] GCP Compute Structure Questions.
   - [ ] Do we want a Docker Container automatically set in Instance & Template.
     - [x] VM instance: `capture-content-2`

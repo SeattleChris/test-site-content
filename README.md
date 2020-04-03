@@ -48,8 +48,8 @@ JSON Response has the following properties:
 
 ## Deployment Settings
 
-[Deployed Site](https://35.230.145.5:8080)
-[Development Site]()
+[Deployed Site](https://capture-dot-engaged-builder-257615.appspot.com)
+[Development Site](https://35.230.145.5:8080)
 
 We are currently deploying on Google Cloud Platform (GCP), with the Google Compute Engine. This is part of the Facebook Insights App. Based off of the templates below, the compute engine instance is named `capture-content-1` or `capture-content-2`. It is hosted in europe-west2 Region (London) and Zone: europe-west2-a
 
@@ -78,18 +78,30 @@ A Compute Engine on GCP handles its connections via Firewall Rules. It seems it 
 
 [Tasks & Checklist](./checklist.md)
 
-Google Cloud Platform Documentation:
+### Google Cloud Platform Documentation
+
+If hosting on Compute Engine (GCE):
 
 - [App on Compute](https://cloud.google.com/python/tutorials/getting-started-on-compute-engine)
 - [Apps to instances](https://cloud.google.com/compute/docs/tutorials/service-account-ssh)
 - [GAE to GCE](https://cloud.google.com/appengine/docs/standard/python3/connecting-vpc)
-- [VPC Firewall](https://cloud.google.com/vpc/docs/using-firewalls)
 - [Compute Docs](https://cloud.google.com/compute/docs)
 - [LAMP on GCE](https://cloud.google.com/community/tutorials/setting-up-lamp#setting-up-dns)
 - [GCE Containers](https://cloud.google.com/compute/docs/containers/deploying-containers)
 - [GCE backend buckets](https://cloud.google.com/sdk/gcloud/reference/compute/backend-buckets)
-- [Cloud Functions as Trigger](https://cloud.google.com/functions/docs/how-to)
+- [Server to Server](https://cloud.google.com/docs/authentication/production#auth-cloud-implicit-python)
 - [Connect Bucket](https://cloud.google.com/compute/docs/disks/gcs-buckets)
+
+If hosting as App Engine - Flex environment (which is also GCE under the hood):
+
+- [GAE Flex yaml](https://cloud.google.com/appengine/docs/flexible/python/reference/app-yaml)
+- [SSH to GAE-Flex](https://cloud.google.com/appengine/docs/flexible/python/debugging-an-instance)
+
+Other Related Documentation:
+
+- [VPC Firewall](https://cloud.google.com/vpc/docs/using-firewalls)
+- [Cloud Functions as Trigger](https://cloud.google.com/functions/docs/how-to)
+- [queue ?python2.7?](https://cloud.google.com/appengine/docs/standard/python/config/queueref)
 
 ## Potential Resources
 
@@ -104,18 +116,21 @@ Google Cloud Platform Documentation:
 
 If not using docker setup.
 
-Install chrome & chromedriver.
+Install chrome & chromedriver. The [setup_chrome.py](./setup_chrome.py) script may achieve this automatically. The manual process is described below.
 
 ```Bash
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 apt install ./google-chrome-stable_current_amd64.deb
-google-chrome --version | get_chromedriver.py
+google-chrome --version
+which google-chrome
 ```
 
 First, find out which version of Chrome you are using. Let's say you have Chrome 72.0.3626.81.
-Take the Chrome version number, remove the last part, and append the result to URL "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_". For example, with Chrome version 72.0.3626.81, you'd get a URL "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_72.0.3626".
+Take the Chrome version number, remove the last part, and append the result to URL `https://chromedriver.storage.googleapis.com/LATEST_RELEASE_`. For example, with Chrome version 72.0.3626.81, you'd get a URL `https://chromedriver.storage.googleapis.com/LATEST_RELEASE_72.0.3626`.
+
 Use the URL created in the last step to retrieve a small file containing the version of ChromeDriver to use. For example, the above URL will get your a file containing "72.0.3626.69". (The actual number may change in the future, of course.)
-Use the version number retrieved from the previous step to construct the URL to download ChromeDriver. With version 72.0.3626.69, the URL would be "https://chromedriver.storage.googleapis.com/index.html?path=72.0.3626.69/".
+
+Use the version number retrieved from the previous step to construct the URL to download ChromeDriver. With version 72.0.3626.69, the URL would be `https://chromedriver.storage.googleapis.com/index.html?path=72.0.3626.69/`.
 After the initial download, it is recommended that you occasionally go through the above process again to see if there are any bug fix releases.
 
 Install Selenium, bs4 (Beautiful Soup), flask, simplejson, python-dotenv, openssl

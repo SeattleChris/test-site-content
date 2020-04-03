@@ -24,6 +24,7 @@ Pipfile.lock
 !env/
 !*.env
 !.env
+!capture.yaml
 
 # Python pycache:
 __pycache__/
