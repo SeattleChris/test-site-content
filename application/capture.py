@@ -58,9 +58,10 @@ def chrome_grab(ig_url, filename):
     options.add_argument("--remote-debugging-port=9222")
     # options.binary_location = chromedriver_binary.chromedriver_filename
     # chrome_executable_path = '/usr/bin/google-chrome'
-    # chromedriver_path = 'chromedriver' if app.config.get('LOCAL_ENV') else 'chromedriver'
-    driver = webdriver.Chrome('chromedriver', chrome_options=options)
-    app.logger.info("==============================================")
+    chromedriver_path = 'chromedriver' if app.config.get('LOCAL_ENV') else '/usr/bin/chromedriver'
+    app.logger.debug(f"Path for chromedriver: {chromedriver_path} . ")
+    driver = webdriver.Chrome(chromedriver_path, chrome_options=options)
+    app.logger.info("=========================== Set driver in chrome_grab ===========================")
     files, message = [], ''
     driver.get(ig_url)
     temp = f"{filename}_full.png"
