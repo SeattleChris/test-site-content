@@ -14,7 +14,7 @@
 | :heavy_check_mark: | Can navigate and capture each desired image           |
 | :heavy_check_mark: | Can be triggered via an API route                     |
 |                    | API usage is limited to authorized use                |
-|                    | Continuously runs, app starts on server re-start      |
+| :heavy_check_mark: | Continuously runs, app starts on server re-start      |
 |                    | Captured images saved to bucket for other app use     |
 |                    | API can accept url and storage location parameters    |
 |                    | **March 2020 Features Completed**                     |
