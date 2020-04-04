@@ -16,6 +16,8 @@ PROJECT_CONNECTOR_NAME = environ.get('PROJECT_CONNECTOR_NAME')
 INSTANCE_NAME = environ.get('INSTANCE_NAME')
 INSTANCE_ID = environ.get('INSTANCE_ID')
 SERVICE_ACCOUNT = environ.get('SERVICE_ACCOUNT')
+CHROME_VERSION = environ.get('CHROME_VERSION')
+CHROMEDRIVER_VERSION = environ.get('CHROMEDRIVER_VERSION')
 DEV_RUN = True if environ.get('DEV_RUN') == 'True' else False
 GAE_SERVICE = environ.get('GAE_SERVICE')
 DEBUG = any([DEV_RUN, environ.get('DEBUG') == 'True', GAE_SERVICE in ('dev', 'capture', )])

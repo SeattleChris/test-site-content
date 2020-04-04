@@ -20,7 +20,9 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
     && rm /tmp/chromedriver_linux64.zip \
     && mv /opt/chromedriver /opt/chromedriver-$CHROMEDRIVER_VERSION \
     && chmod 755 /opt/chromedriver-$CHROMEDRIVER_VERSION \
-    && ln -fs /opt/chromedriver-$CHROMEDRIVER_VERSION /usr/bin/chromedriver
+    && ln -fs /opt/chromedriver-$CHROMEDRIVER_VERSION/chromedriver /usr/bin/chromedriver \
+    && export CHROME_VERSION=$CHROME_VERSION \
+    && export CHROMEDRIVER_VERSION=$CHROMEDRIVER_VERSION
 # Copy the application's requirements.txt and run pip to install all dependencies into the virtualenv.
 ADD requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt

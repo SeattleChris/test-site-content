@@ -96,8 +96,6 @@ def api(id, media_type, media_id):
     app.logger.debug('---------- Capture gave us an answer ----------')
     app.logger.debug(answer)
     answer['url'] = path  # TODO: Update when saving to Bucket.
-    app.logger.debug('------------ We can jsonify it --------------')
-    app.logger.debug(jsonify(answer))
     return jsonify(answer)
 
 
