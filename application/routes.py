@@ -1,5 +1,6 @@
-from flask import request, render_template, jsonify, current_app as app
+from flask import request, render_template, flash, jsonify, current_app as app
 from .capture import capture
+from .file_storage import move_captured_to_bucket, list_buckets
 from .errors import InvalidUsage
 # from flask import redirect, url_for, request, flash
 import simplejson as json
@@ -16,7 +17,14 @@ def home():
     app.logger.debug(json.dumps(test))
     app.logger.debug(request)
     result = 'This is the Home Page!'
+    flash("Loaded Home Page. ")
     return render_template('base.html', result=result)
+
+
+@app.route('/bucket_list')
+def bucket_list():
+    buckets = list_buckets()
+    return render_template('base.html', result=buckets)
 
 
 @app.route('/hello')
@@ -80,22 +88,24 @@ def api(id, media_type, media_id):
     # make sure this is new post id, and make the id directory.
     path = os.path.join(BASE_DIR, 'post')
     path = os.path.join(path, str(id))
+    name = media_type.lower()
     try:
         os.mkdir(path)
-        filename = f"{path}/{media_type.lower()}"
     except FileExistsError as e:
         app.logger.debug(f"Error in test: Directory already exists at {path} ")
         app.logger.error(e)
-        filename = f"{path}/{media_type.lower()}_{str(media_id)}"
+        name += f"_{str(media_id)}"
     except OSError as e:
-        app.logger.debug(f"Error in test function creating dir {path}")
+        app.logger.debug(f"Error in test function creating dir {path} ")
         app.logger.error(e)
         raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
+    filename = f"{str(path)}/{name}"
     app.logger.debug(filename)
     answer = capture(url=ig_url, filename=filename)
     app.logger.debug('---------- Capture gave us an answer ----------')
     app.logger.debug(answer)
-    answer['url'] = path  # TODO: Update when saving to Bucket.
+    answer = move_captured_to_bucket(answer, path, id)
+    # answer['url'] = path  # TODO: Update when saving to Bucket.
     return jsonify(answer)
 
 
