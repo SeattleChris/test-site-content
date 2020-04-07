@@ -1,13 +1,16 @@
-runtime: python
+# runtime: python
+# env: flex
+# service: [service_name]
+# # instance_class: F1
+# # https://cloud.google.com/appengine/docs/flexible/python/runtime
+# runtime_config:
+#   python_version: 3
+
+service: [service_name]
+runtime: custom
 env: flex
 entrypoint: gunicorn -b :$PORT main:app
-# entrypoint: gunicorn -c gunicorn.conf.py -b :$PORT
-# http://docs.gunicorn.org/en/19.3/settings.html
-service: [service_name]
-# instance_class: F1
-# https://cloud.google.com/appengine/docs/flexible/python/runtime
-runtime_config:
-  python_version: 3
+# # http://docs.gunicorn.org/en/19.3/settings.html
 
 # https://cloud.google.com/appengine/docs/flexible/python/configuring-your-app-with-app-yaml
 # manual_scaling:
@@ -38,6 +41,7 @@ env_variables:
   PROJECT_NUMBER: 'from-GCP-dashboard'
   PROJECT_REGION: 'from-GCP-dashboard'
   PROJECT_ZONE: 'from-GCP-dashboard'
+  CLOUD_STORAGE_BUCKET: 'either PROJECT_ID.appspot.com or bucketname.appspot.com'
   PROJECT_CONNECTOR_NAME: 'from-GCP-connector-name'
   URL: 'https://[service_name]-dot-[PROJECT_ID].appspot.com'
   DEV_RUN: 'False'
