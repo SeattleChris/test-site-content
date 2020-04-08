@@ -21,7 +21,7 @@ CHROME_VERSION = environ.get('CHROME_VERSION')
 CHROMEDRIVER_VERSION = environ.get('CHROMEDRIVER_VERSION')
 DEV_RUN = True if environ.get('DEV_RUN') == 'True' else False
 GAE_SERVICE = environ.get('GAE_SERVICE')
-DEBUG = any([DEV_RUN, environ.get('DEBUG') == 'True', GAE_SERVICE in ('dev', 'capture', )])
+DEBUG = any([DEV_RUN, environ.get('DEBUG') == 'True', GAE_SERVICE in ('dev', 'dev-capture', )])
 DEPLOYED_URL = environ.get('DEPLOYED_URL', environ.get('URL', ''))
 GAE_ENV = environ.get('GAE_ENV')  # Temporary
 deploy_options = [environ.get('GAE_ENV') == 'flex',
