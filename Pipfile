@@ -15,6 +15,7 @@ python-dotenv = "*"
 pyopenssl = "*"
 gunicorn = "*"
 requests = "*"
+google-cloud-storage = "*"
 
 [requires]
 python_version = "3.7"

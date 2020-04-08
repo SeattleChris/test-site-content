@@ -1,51 +1,9 @@
-""" Original Attempts from a different project running this inside a Flask app. """
 from flask import flash, current_app as app
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 import time
 import re
 from os import path
-# from pprint import pprint
-# import json
-
-
-# def phantom_grab(ig_url, filename):
-#     """ Using selenium webdriver with phantom js and grabing the file from the page content. """
-#     # from phantomjs import Phantom
-#     from phantomjs_bin import executable_path
-
-#     driver = webdriver.PhantomJS(executable_path=executable_path)
-#     app.logger.info("==============================================")
-#     files, message = [], ''
-#     driver.get(ig_url)
-#     temp = f"{filename}_full.png"
-#     success = driver.save_screenshot(temp)
-#     count = 0 if success else -1
-#     files.append(temp)
-#     app.logger.debug(f"Start of count at {count + 1}. ")
-#     soup = bs(driver.page_source, 'html.parser')
-#     # TODO: Determine if we can do this without BeautifulSoup processes.
-#     target = [img.get('src') for img in soup.findAll('img') if not re.search("^\/", img.get('src'))]
-#     pprint(target)
-#     for ea in target:
-#         count += 1
-#         time.sleep(1)
-#         try:
-#             driver.get(ea)
-#             temp = f"{filename}_{count}.png"
-#             files.append(temp)
-#             driver.save_screenshot(temp)
-#         except Exception as e:
-#             temp = f"Error on file # {count} . "
-#             message += temp
-#             app.logger.exception(e)
-#     success = count == len(target)
-#     message += 'Files Saved! ' if success else "Error in Screen Grab. "
-#     app.logger.debug(message)
-#     answer = {'success': success, 'message': message, 'file_list': files}
-#     driver.close()
-#     # driver.exit()  # Needed?
-#     return answer
 
 
 def chrome_grab(ig_url, filename):
@@ -58,16 +16,19 @@ def chrome_grab(ig_url, filename):
     options.add_argument("--remote-debugging-port=9222")
     # options.binary_location = chromedriver_binary.chromedriver_filename
     # chrome_executable_path = '/usr/bin/google-chrome'
-    # chromedriver_path = 'chromedriver' if app.config.get('LOCAL_ENV') else 'chromedriver'
-    driver = webdriver.Chrome('chromedriver', chrome_options=options)
-    app.logger.info("==============================================")
-    files, message = [], ''
+    chromedriver_path = 'chromedriver' if app.config.get('LOCAL_ENV') else '/usr/bin/chromedriver'
+    driver = webdriver.Chrome(chromedriver_path, chrome_options=options)
+    app.logger.info("=========================== Set driver in chrome_grab ===========================")
+    files, error_files, message, count, error_count = [], [], '', 0, 0
     driver.get(ig_url)
     temp = f"{filename}_full.png"
     success = driver.save_screenshot(temp)
-    error_count = 0 if success else 1
-    count = 0 if success else -1
-    files.append(temp)
+    if success:
+        files.append(temp)
+    else:
+        error_files.append(temp)
+        error_count += 1
+        count -= 1
     app.logger.debug(f"Start of count at {count + 1}. ")
     soup = bs(driver.page_source, 'html.parser')
     # TODO: Determine if we can do this without BeautifulSoup processes.
@@ -75,21 +36,26 @@ def chrome_grab(ig_url, filename):
     for ea in target:
         count += 1
         time.sleep(1)
+        temp = f"{filename}_{count}.png"
         try:
             driver.get(ea)
-            temp = f"{filename}_{count}.png"
+            success = driver.save_screenshot(temp)
+            # capture_screenshot_to_string()
+            # driver.get_screenshot_as_base64()
+            if not success:
+                raise Exception("Screenshot not saved. ")
             files.append(temp)
-            driver.save_screenshot(temp)
         except Exception as e:
             message += f"Error on file # {count} . "
             error_count += 1
+            error_files.append(temp)
             app.logger.exception(e)
     success = error_count == 0
     message += 'Files Saved! ' if success else "Error in Screen Grab. "
     app.logger.debug(message)
-    answer = {'success': success, 'message': message, 'file_list': files}
-    driver.close()
-    # driver.quit()  # Needed?
+    answer = {'success': success, 'message': message, 'file_list': files, 'error_files': error_files}
+    # driver.close()  # Needed?
+    driver.quit()  # Needed?
     # driver.exit()  # Needed?
     return answer
 
@@ -142,7 +108,7 @@ def soup_no_chrome(ig_url, filename):
     return answer
 
 
-def capture(url=None, post=None, filename='screenshot'):
+def capture(url=None, post=None, filename='path/screenshot'):
     """ Visits the permalink for give Post, creates a screenshot named the given filename. """
     ig_url = post.permalink if post else 'https://www.instagram.com/p/B4dQzq8gukI/'
     ig_url = url or ig_url

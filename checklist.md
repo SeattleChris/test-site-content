@@ -14,7 +14,7 @@
 | :heavy_check_mark: | Can navigate and capture each desired image           |
 | :heavy_check_mark: | Can be triggered via an API route                     |
 |                    | API usage is limited to authorized use                |
-|                    | Continuously runs, app starts on server re-start      |
+| :heavy_check_mark: | Continuously runs, app starts on server re-start      |
 |                    | Captured images saved to bucket for other app use     |
 |                    | API can accept url and storage location parameters    |
 |                    | **March 2020 Features Completed**                     |
@@ -31,7 +31,7 @@
 - [s] Stretch Goal. Not for current feature plan.
 
 Current Status:
-2020-03-31 15:24:26
+2020-04-03 15:18:11
 <!-- Ctrl-Shift-I to generate timestamp -->
 
 ### Structure & Resources
@@ -51,27 +51,26 @@ Current Status:
 - [n] Use Cloud Run?
   - [x] filesystem writes not persisted. Must save to Bucket.
   - [?] No Chrome? "a container instance does not have any CPU available if it is not processing a request."
-- [ ] App Engine - Flex Environment
-  - [ ] Can it install and run Chrome?
-  - [ ] Run startup script to check and install chrome only if needed.
-    - [ ] This may need to be done through metadata for the application?
-  - [ ] run as a service, and connect to other services (default, dev).
-- [ ] GCP Compute Structure Questions.
-  - [ ] Do we want a Docker Container automatically set in Instance & Template.
+- [x] App Engine - Flex Environment
+  - [x] Can it install and run Chrome?
+  - [x] Custom Dockerfile: determine version & install chromedriver.
+  - [x] run as a service (capture), and connect to other services (default, dev).
+- [n] GCP Compute Structure Questions.
+  - [n] Do we want a Docker Container automatically set in Instance & Template.
     - [x] VM instance: `capture-content-2`
     - [x] Start with selenium and standalone chrome.
-    - [ ] Add container for our specific code.
-    - [ ] can get it connected and exposed route running on GCP.
+    - [n] Add container for our specific code.
+    - [n] can get it connected and exposed route running on GCP.
     - [?] Create and use a startup script, if needed.
-  - [ ] Do we want a startup script to install packages and start process?
-  - [ ] Do we just install packages, and know they will be there on load up?
+  - [n] Do we want a startup script to install packages and start process?
+  - [n] Do we just install packages, and know they will be there on load up?
     - [x] VM instance: `capture-content-1` .
     - [x] Seems complicated in maintaining the code up to date.
     - [x] Get an exposed route for other apps.
-  - [ ] App always running.
-    - [x] Install screen.
-    - [X] screen works to keep process running after logout.
-    - [ ] Startup script to start app works on server restart.
+- [x] App always running.
+  - [x] Install screen.
+  - [X] screen works to keep process running after logout.
+  - [n] Startup script to start app works on server restart.
 - [x] Setup initial application structure.
 - [ ] Can be called by the platform application.
   - [x] as an open route for an API call.

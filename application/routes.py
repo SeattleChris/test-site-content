@@ -1,10 +1,12 @@
-from flask import request, render_template, jsonify, current_app as app
+from flask import request, render_template, url_for, flash, jsonify, current_app as app
 from .capture import capture
+from .file_storage import setup_local_storage, move_captured_to_bucket, list_buckets, list_blobs
 from .errors import InvalidUsage
 # from flask import redirect, url_for, request, flash
 import simplejson as json
 import os
 import requests
+from pprint import pprint
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.join(BASE_DIR, 'save')
@@ -15,14 +17,35 @@ def home():
     test = {'success': True, 'route': 'home'}
     app.logger.debug(json.dumps(test))
     app.logger.debug(request)
-    result = 'This is the Home Page!'
-    return render_template('base.html', result=result)
+    message = 'This is the Home Page!'
+    flash("Loaded Home Page. ")
+    app.logger.debug('=============================== Home Route ===============================')
+    return render_template('base.html', text=message, results=None, links=False)
+
+
+@app.route('/bucket_list')
+def bucket_list():
+    bucket_names = list_buckets()
+    buckets = [(name, url_for('blob_list', bucket_name=name)) for name in bucket_names]
+    return render_template('base.html', text="Bucket List", results=buckets, links=True)
+
+
+@app.route('/blob_list/<string:bucket_name>')
+def blob_list(bucket_name):
+    bucket_name = app.config.get('CLOUD_STORAGE_BUCKET') if bucket_name == 'default' else bucket_name
+    blobs = list_blobs(bucket_name)
+    results = [(blob.name, blob.public_url) for blob in blobs]
+    return render_template('base.html', text="Blob List", results=results, links=True)
 
 
 @app.route('/hello')
 def hello():
     res = {'success': True, 'route': 'hello', 'answer': 'Hello World! '}
     res.update(app.config)
+    removed_val = res.pop('PERMANENT_SESSION_LIFETIME', 'NOT FOUND')
+    app.logger.debug(f"PERMANENT_SESSION_LIFETIME: {removed_val} ")
+    removed_val = res.pop('SEND_FILE_MAX_AGE_DEFAULT', 'NOT FOUND')
+    app.logger.debug(f"SEND_FILE_MAX_AGE_DEFAULT: {removed_val} ")
     app.logger.debug(json.dumps(res))
     app.logger.debug(BASE_DIR)
     return jsonify(res)
@@ -45,22 +68,27 @@ def test():
         app.logger.error(e)
         raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
     answer = capture(filename=filename)
-    return render_template('base.html', result=answer)
+    return render_template('base.html', text=answer, results=answer, links=False)
 
 
 @app.route('/call')
 def call():
     test_ig = 'https://www.instagram.com/p/B4dQzq8gukI/'
     url = app.config.get('URL')
-    id = 1
+    id = 2
     media_type = 'faked'
     media_id = 1369
     api_url = f"{url}/api/v1/post/{str(id)}/{media_type}/{str(media_id)}/"
     payload = {'url': test_ig}
+    app.logger.debug('========== Making a requests to our own API. ===========')
+    app.logger.debug(api_url)
+    app.logger.debug(payload)
     res = requests.get(api_url, params=payload)
-    app.logger.debug('---------- Our Call got back: --------------------------')
-    app.logger.debug(res.json())
-    return render_template('base.html', result=res.json())
+    app.logger.debug('---------- Our Call got back and object with dir: --------------------------')
+    pprint(dir(res))
+    app.logger.debug('--------------------------------------------------------')
+    pprint(res.json())
+    return render_template('base.html', text=res.json(), results=res.json(), links=False)
 
 
 @app.route('/api/v1/post/<int:id>/<string:media_type>/<int:media_id>/')
@@ -71,26 +99,37 @@ def api(id, media_type, media_id):
     ig_url = request.args.get('url')
     app.logger.debug('========== the API was called! ==========')
     # make sure this is new post id, and make the id directory.
+    filename = setup_local_storage(id, media_type, media_id)
     path = os.path.join(BASE_DIR, 'post')
-    path = os.path.join(path, str(id))
-    try:
-        os.mkdir(path)
-        filename = f"{path}/{media_type}"
-    except FileExistsError as e:
-        app.logger.debug(f"Error in test: Directory already exists at {path} ")
-        app.logger.error(e)
-        filename = f"{path}/{media_type}_{media_id}"
-    except OSError as e:
-        app.logger.debug(f"Error in test function creating dir {path}")
-        app.logger.error(e)
-        raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
+    # path = os.path.join(path, str(id))
+    # name = media_type.lower()
+    # try:
+    #     os.mkdir(path)
+    # except FileExistsError as e:
+    #     app.logger.debug(f"Error in test: Directory already exists at {path} ")
+    #     app.logger.error(e)
+    #     name += f"_{str(media_id)}"
+    # except OSError as e:
+    #     app.logger.debug(f"Error in test function creating dir {path} ")
+    #     app.logger.error(e)
+    #     raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
+    # filename = f"{str(path)}/{name}"
     app.logger.debug(filename)
     answer = capture(url=ig_url, filename=filename)
+    # answer = {'success': True,
+    #           'message': 'Files Saved! ',
+    #           'file_list': ['/home/chris/newcode/test-site-content/save/post/1/faked_full.png',
+    #                         '/home/chris/newcode/test-site-content/save/post/1/faked_1.png',
+    #                         '/home/chris/newcode/test-site-content/save/post/1/faked_2.png',
+    #                         '/home/chris/newcode/test-site-content/save/post/1/faked_3.png'
+    #                         ],
+    #           'error_files': []
+    #           }
     app.logger.debug('---------- Capture gave us an answer ----------')
-    app.logger.debug(answer)
-    answer['url'] = path  # TODO: Update when saving to Bucket.
-    app.logger.debug('------------ We can jsonify it --------------')
-    app.logger.debug(jsonify(answer))
+    pprint(answer)
+    answer = move_captured_to_bucket(answer, path, id)
+    app.logger.debug('---------- Move to Bucket gave us an answer ----------')
+    pprint(answer)
     return jsonify(answer)
 
 

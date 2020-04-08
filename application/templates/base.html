@@ -16,6 +16,8 @@
   <nav>
     <ul>
       <li><a href="{{ url_for('home') }}">Home</a></li>
+      <li><a href="{{ url_for('bucket_list') }}">List Buckets</a></li>
+      <li><a href="{{ url_for('blob_list', bucket_name='default') }}">List Blobs</a></li>
       <li><a href="{{ url_for('hello') }}">Hello</a></li>
       <li><a href="{{ url_for('test') }}">Test</a></li>
       <li><a href="{{ url_for('call') }}">Call</a></li>
@@ -35,10 +37,20 @@
 {% block content %}
 <main>
   <h1>Testing Response</h1>
-  {% if result %}
-  <p>{{result}} </p>
+  {% if text %}
+  <p>{{text}} </p>
   {% else %}
-  <p>No result. </p>
+  <p>No text. </p>
+  {% endif %}
+  <hr />
+  {% if results %}
+  <ul>
+    {% for result in results %}
+    <li>{% if links %}<a href="{{result[1]}}">{{result[0]}}</a>{% else %}{{result}}{% endif %}</li>
+    {% else %}
+    <li>Empty results. </li>
+    {% endfor %}
+  </ul>
   {% endif %}
 </main>
 {% endblock content %}

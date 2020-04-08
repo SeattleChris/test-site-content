@@ -12,10 +12,13 @@ PROJECT_ID = environ.get('PROJECT_ID')
 PROJECT_NUMBER = environ.get('PROJECT_NUMBER')
 PROJECT_REGION = environ.get('PROJECT_REGION')
 PROJECT_ZONE = environ.get('PROJECT_ZONE')
+CLOUD_STORAGE_BUCKET = environ.get('CLOUD_STORAGE_BUCKET')
 PROJECT_CONNECTOR_NAME = environ.get('PROJECT_CONNECTOR_NAME')
 INSTANCE_NAME = environ.get('INSTANCE_NAME')
 INSTANCE_ID = environ.get('INSTANCE_ID')
 SERVICE_ACCOUNT = environ.get('SERVICE_ACCOUNT')
+CHROME_VERSION = environ.get('CHROME_VERSION')
+CHROMEDRIVER_VERSION = environ.get('CHROMEDRIVER_VERSION')
 DEV_RUN = True if environ.get('DEV_RUN') == 'True' else False
 GAE_SERVICE = environ.get('GAE_SERVICE')
 DEBUG = any([DEV_RUN, environ.get('DEBUG') == 'True', GAE_SERVICE in ('dev', 'capture', )])
@@ -30,5 +33,6 @@ if any(deploy_options):
     URL = DEPLOYED_URL
     LOCAL_ENV = False
 else:
-    URL = 'http://0.0.0.0:8080'
+    # URL = 'http://127.0.0.1:8080'
+    URL = 'http://127.0.0.1:5000'
     LOCAL_ENV = True
