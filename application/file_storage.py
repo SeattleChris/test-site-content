@@ -28,6 +28,31 @@ def setup_local_storage(id, media_type, media_id):
     return path, filename
 
 
+def delete_local_files(answer, path):
+    """ Delete from the App Engine instance the locally saved copy now that we are done with it. """
+    local_files = answer.get('file_list', [])
+    deleted_files = []
+    for filename in local_files:
+        try:
+            os.remove(filename)
+            deleted_files.append(filename)
+        except Exception as e:
+            app.logger.info(f"=============== Error in delete_local_files: {filename} ===============")
+            app.logger.error(e)
+            app.logger.info("=============== Error in delete_local_files - End. ===============")
+            raise e
+    try:
+        os.rmdir(path)
+        deleted_files.append(path)
+    except Exception as e:
+        app.logger.info(f"=============== Error in delete_local_files: {path} ===============")
+        app.logger.error(e)
+        app.logger.info("=============== Error in delete_local_files - End. ===============")
+        raise e
+    answer['deleted'] = deleted_files
+    return answer
+
+
 def list_buckets():
     buckets = gcs.list_buckets()
     names = []
@@ -52,14 +77,14 @@ def upload_blob(source_file_name, destination_blob_name, bucket=default_bucket):
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename(source_file_name)  # blob.upload_from_file(source_file)
     blob.make_public()  # blob.make_private()
-    app.logger.debug(f"File {source_file_name} uploaded to {destination_blob_name} . ")
+    # app.logger.debug(f"File {source_file_name} uploaded to {destination_blob_name} . ")
     # TODO: Plan for return value if we wanted blob.make_private()
     return blob.public_url
 
 
-def get_or_create_folder(folder, bucket=default_bucket):
+def get_or_create_folder(folder_id, bucket=default_bucket):
     """ If folder does not exist, creates it. Returns a Blob object for this folder. """
-    folder = f"posts/{str(folder)}"
+    folder = f"posts/{str(folder_id)}"
     blob = None
     try:
         blob = bucket.get_blob(folder)
@@ -72,7 +97,6 @@ def get_or_create_folder(folder, bucket=default_bucket):
         pprint(e)
         app.logger.debug('---------------------- get or create folder Exception End ------------------')
         raise e
-    app.logger.debug(f"********* blob folder is: {blob} *********")
     return blob
 
 
@@ -81,8 +105,8 @@ def move_captured_to_bucket(answer, path, id):
     # answer = {'success': success, 'message': message, 'file_list': files, 'error_files': error_files}
     app.logger.debug('============================= Move Captured to Bucket ==============================')
     folder = get_or_create_folder(id)
-    app.logger.debug('------------ List of Files ------------')
     files = answer.get('file_list', [])
+    app.logger.debug('------------ List of Files ------------')
     pprint(files)
     stored_urls = []
     for ea in files:
@@ -91,4 +115,5 @@ def move_captured_to_bucket(answer, path, id):
         blob_url = upload_blob(ea, blobname)
         stored_urls.append(blob_url)
     answer['url_list'] = stored_urls
+    answer = delete_local_files(answer, path)
     return answer
