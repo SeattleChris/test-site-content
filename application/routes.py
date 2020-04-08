@@ -6,6 +6,7 @@ from .errors import InvalidUsage
 import simplejson as json
 import os
 import requests
+from pprint import pprint
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.join(BASE_DIR, 'save')
@@ -18,6 +19,7 @@ def home():
     app.logger.debug(request)
     message = 'This is the Home Page!'
     flash("Loaded Home Page. ")
+    app.logger.debug('=============================== Home Route ===============================')
     return render_template('base.html', text=message, results=None, links=False)
 
 
@@ -73,7 +75,7 @@ def test():
 def call():
     test_ig = 'https://www.instagram.com/p/B4dQzq8gukI/'
     url = app.config.get('URL')
-    id = 1
+    id = 2
     media_type = 'faked'
     media_id = 1369
     api_url = f"{url}/api/v1/post/{str(id)}/{media_type}/{str(media_id)}/"
@@ -82,8 +84,8 @@ def call():
     app.logger.debug(api_url)
     app.logger.debug(payload)
     res = requests.get(api_url, params=payload)
-    app.logger.debug('---------- Our Call got back: --------------------------')
-    app.logger.debug(res)
+    app.logger.debug('---------- Our Call got back and object with dir: --------------------------')
+    app.logger.debug(dir(res))
     app.logger.debug('--------------------------------------------------------')
     app.logger.debug(res.json())
     return render_template('base.html', text=res.json(), results=res.json(), links=False)
@@ -100,33 +102,33 @@ def api(id, media_type, media_id):
     path = os.path.join(BASE_DIR, 'post')
     path = os.path.join(path, str(id))
     name = media_type.lower()
-    # try:
-    #     os.mkdir(path)
-    # except FileExistsError as e:
-    #     app.logger.debug(f"Error in test: Directory already exists at {path} ")
-    #     app.logger.error(e)
-    #     name += f"_{str(media_id)}"
-    # except OSError as e:
-    #     app.logger.debug(f"Error in test function creating dir {path} ")
-    #     app.logger.error(e)
-    #     raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
+    try:
+        os.mkdir(path)
+    except FileExistsError as e:
+        app.logger.debug(f"Error in test: Directory already exists at {path} ")
+        app.logger.error(e)
+        name += f"_{str(media_id)}"
+    except OSError as e:
+        app.logger.debug(f"Error in test function creating dir {path} ")
+        app.logger.error(e)
+        raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
     filename = f"{str(path)}/{name}"
     app.logger.debug(filename)
-    # answer = capture(url=ig_url, filename=filename)
-    answer = {'success': True,
-              'message': 'Files Saved! ',
-              'file_list': ['/home/chris/newcode/test-site-content/save/post/1/faked_full.png',
-                            '/home/chris/newcode/test-site-content/save/post/1/faked_1.png',
-                            '/home/chris/newcode/test-site-content/save/post/1/faked_2.png',
-                            '/home/chris/newcode/test-site-content/save/post/1/faked_3.png'
-                            ],
-              'error_files': []
-              }
+    answer = capture(url=ig_url, filename=filename)
+    # answer = {'success': True,
+    #           'message': 'Files Saved! ',
+    #           'file_list': ['/home/chris/newcode/test-site-content/save/post/1/faked_full.png',
+    #                         '/home/chris/newcode/test-site-content/save/post/1/faked_1.png',
+    #                         '/home/chris/newcode/test-site-content/save/post/1/faked_2.png',
+    #                         '/home/chris/newcode/test-site-content/save/post/1/faked_3.png'
+    #                         ],
+    #           'error_files': []
+    #           }
     app.logger.debug('---------- Capture gave us an answer ----------')
-    app.logger.debug(answer)
+    pprint(answer)
     answer = move_captured_to_bucket(answer, path, id)
     app.logger.debug('---------- Move to Bucket gave us an answer ----------')
-    app.logger.debug(answer)
+    pprint(answer)
     return jsonify(answer)
 
 
