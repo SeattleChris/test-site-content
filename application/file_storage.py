@@ -1,15 +1,30 @@
 
 from flask import flash, current_app as app
 from google.cloud import storage
+from .errors import InvalidUsage
 from pprint import pprint
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_DIR = os.path.join(BASE_DIR, 'save')
-BASE_DIR = os.path.join(BASE_DIR, 'post')
-placeholder_filename = os.path.join(BASE_DIR, 'placeholder')
 gcs = storage.Client()
 default_bucket = gcs.get_bucket(app.config.get('CLOUD_STORAGE_BUCKET'))
+
+
+def setup_local_storage(id, media_type, media_id):
+    """ Create, or use existing, directory for temporarily storing the files on the server. """
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = os.path.join(BASE_DIR, 'save', 'posts', str(id))
+    name = media_type.lower()
+    try:
+        os.mkdir(path)
+    except FileExistsError as e:
+        app.logger.debug(f"Error in test: Directory already exists at {path} ")
+        app.logger.error(e)
+        name += f"_{str(media_id)}"
+    except OSError as e:
+        app.logger.debug(f"Error in test function creating dir {path} ")
+        app.logger.error(e)
+        raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
+    return f"{str(path)}/{name}"
 
 
 def list_buckets():
@@ -50,7 +65,6 @@ def get_or_create_folder(folder, bucket=default_bucket):
     #     pprint(ea)
     blob = None
     try:
-        # blob = upload_blob(placeholder_filename, folder)
         blob = bucket.get_blob(folder)
         if not blob:
             blob = bucket.blob(folder)

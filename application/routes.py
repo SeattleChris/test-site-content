@@ -1,6 +1,6 @@
 from flask import request, render_template, url_for, flash, jsonify, current_app as app
 from .capture import capture
-from .file_storage import move_captured_to_bucket, list_buckets, list_blobs
+from .file_storage import setup_local_storage, move_captured_to_bucket, list_buckets, list_blobs
 from .errors import InvalidUsage
 # from flask import redirect, url_for, request, flash
 import simplejson as json
@@ -85,9 +85,9 @@ def call():
     app.logger.debug(payload)
     res = requests.get(api_url, params=payload)
     app.logger.debug('---------- Our Call got back and object with dir: --------------------------')
-    app.logger.debug(dir(res))
+    pprint(dir(res))
     app.logger.debug('--------------------------------------------------------')
-    app.logger.debug(res.json())
+    pprint(res.json())
     return render_template('base.html', text=res.json(), results=res.json(), links=False)
 
 
@@ -99,20 +99,21 @@ def api(id, media_type, media_id):
     ig_url = request.args.get('url')
     app.logger.debug('========== the API was called! ==========')
     # make sure this is new post id, and make the id directory.
+    filename = setup_local_storage(id, media_type, media_id)
     path = os.path.join(BASE_DIR, 'post')
-    path = os.path.join(path, str(id))
-    name = media_type.lower()
-    try:
-        os.mkdir(path)
-    except FileExistsError as e:
-        app.logger.debug(f"Error in test: Directory already exists at {path} ")
-        app.logger.error(e)
-        name += f"_{str(media_id)}"
-    except OSError as e:
-        app.logger.debug(f"Error in test function creating dir {path} ")
-        app.logger.error(e)
-        raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
-    filename = f"{str(path)}/{name}"
+    # path = os.path.join(path, str(id))
+    # name = media_type.lower()
+    # try:
+    #     os.mkdir(path)
+    # except FileExistsError as e:
+    #     app.logger.debug(f"Error in test: Directory already exists at {path} ")
+    #     app.logger.error(e)
+    #     name += f"_{str(media_id)}"
+    # except OSError as e:
+    #     app.logger.debug(f"Error in test function creating dir {path} ")
+    #     app.logger.error(e)
+    #     raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
+    # filename = f"{str(path)}/{name}"
     app.logger.debug(filename)
     answer = capture(url=ig_url, filename=filename)
     # answer = {'success': True,
