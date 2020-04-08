@@ -72,9 +72,9 @@ def list_blobs(bucket):
 
 def upload_blob(source_file_name, destination_blob_name, bucket=default_bucket):
     """Uploads a file to the bucket by creating a blob and uploading the indicated file. """
-    # TODO: Bring back the overwrite protection of the next couple of lines.
-    # if bucket.get_blob(destination_blob_name):
-    #     destination_blob_name = f"{time.strftime('%Y%m%d-%H%M%S')}_{destination_blob_name}"
+    # TODO: Save time over following Blob name check?
+    if bucket.get_blob(destination_blob_name):
+        destination_blob_name = f"{time.strftime('%Y%m%d-%H%M%S')}_{destination_blob_name}"
     # Create a new blob for where to upload the file's content.
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename(source_file_name)  # blob.upload_from_file(source_file)

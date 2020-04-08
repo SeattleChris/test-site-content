@@ -58,7 +58,7 @@ def hello():
 def call():
     test_ig = 'https://www.instagram.com/p/B4dQzq8gukI/'
     url = app.config.get('URL')
-    id = 1
+    id = 3
     media_type = 'faked'
     media_id = 4213
     api_url = f"{url}/api/v1/post/{str(id)}/{media_type}/{str(media_id)}/"
