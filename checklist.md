@@ -18,6 +18,8 @@
 | :heavy_check_mark: | Delete excess files after copies saved to Storage.    |
 |                    | API usage is limited to authorized use                |
 |                    | **March 2020 Features Completed**                     |
+|                    | Using GCP Tasks, digesting queue and updating DB      |
+|                    | DB records media file assoc, after files in Storage   |
 |                    | API can accept url and storage location parameters    |
 
 ## Checklist
@@ -32,7 +34,7 @@
 - [s] Stretch Goal. Not for current feature plan.
 
 Current Status:
-2020-04-07 23:30:38
+2020-04-08 15:06:01
 <!-- Ctrl-Shift-I to generate timestamp -->
 
 ### Structure & Resources
@@ -46,6 +48,12 @@ Current Status:
 - [x] Create checklist connected to the Readme.
 - [x] setup env, gitignore, gcloudignore.
 - [ ] ? Use Tasks or a queue system as entry point trigger to start task?
+  - [ ] Can it connect and digest the Task queue.
+  - [ ] Does it record what Task queues have been processed.
+  - [ ] How does the DB update the Post record to associate the media files?
+    - [ ] Output another Task queue and have the Platform application process it.
+    - [ ] Have this application connect and update the DB directly?
+  - [ ] Take a warmup request or other technique to allow server to go to 0 live versions?
 - [n] Use Cloud Functions?
   - [n] Can Chrome run on Cloud Functions.
   - [n] Used as trigger or interface to Engine.
