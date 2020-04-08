@@ -66,7 +66,6 @@ def list_blobs(bucket):
     """Lists all the blobs in a bucket. Input is is either a GCP bucket object, or a string of a bucket name. """
     bucket = default_bucket if bucket is None else bucket
     bucket_name = bucket if isinstance(bucket, str) else bucket.name
-    app.logger.info(f"========== got a list of blobs in {bucket_name} =========")
     blobs = gcs.list_blobs(bucket_name)
     return blobs
 
@@ -105,8 +104,9 @@ def move_captured_to_bucket(answer, path, id):
     # answer = {'success': success, 'message': message, 'file_list': files, 'error_files': error_files}
     app.logger.debug('============================= Move Captured to Bucket ==============================')
     folder = get_or_create_folder(id)
-    files = answer.get('file_list', [])
+    app.logger.debug(folder)
     app.logger.debug('------------ List of Files ------------')
+    files = answer.get('file_list', [])
     pprint(files)
     stored_urls = []
     for ea in files:

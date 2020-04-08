@@ -58,9 +58,9 @@ def hello():
 def call():
     test_ig = 'https://www.instagram.com/p/B4dQzq8gukI/'
     url = app.config.get('URL')
-    id = 3
+    id = 4
     media_type = 'faked'
-    media_id = 1369
+    media_id = 4213
     api_url = f"{url}/api/v1/post/{str(id)}/{media_type}/{str(media_id)}/"
     payload = {'url': test_ig}
     app.logger.debug('========== Making a requests to our own API. ===========')
@@ -68,9 +68,9 @@ def call():
     app.logger.debug(payload)
     res = requests.get(api_url, params=payload)
     app.logger.debug('---------- Our Call got back a response. --------------------------')
-    app.logger.debug(res.status_code)
+    app.logger.debug(f"Status code: {res.status_code} ")
     pprint(res.json())
-    return render_template('base.html', text=res.json(), results=res.json(), links='dict')
+    return render_template('base.html', text=res.json().get('message', 'NO MESSAGE'), results=res.json(), links='dict')
 
 
 @app.route('/api/v1/post/<int:id>/<string:media_type>/<int:media_id>/')
