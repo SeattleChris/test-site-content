@@ -100,6 +100,8 @@ Current Status:
 - [x] Returns a JSON Response with `success` boolean, and other information.
 - [x] Returns a JSON Response with `url` string of where the file is stored.
 - [x] Update API: remove `url`, now returns `url_list` as a list of strings for urls for each file.
+- [x] Update API: `url` directs to the summary.txt file that also has the `url_list` content.
+- [x] Overwrite protection for Storage blob name, using a timestamp string prepended to file.
 - [x] Can save to a static files bucket that can be used by other application.
 - [x] Delete file copies on server after files are saved to Storage bucket.
 - [x] Returned urls in url_list accurately link to view the image files.
@@ -112,3 +114,4 @@ Current Status:
   - [?] Only works via backend routes?
   - [?] Utilize authorization set up via Google Cloud Platform.
   - [?] Set up authorization API keys
+- [ ] Confirm it works for Story Posts and for regular Posts.
