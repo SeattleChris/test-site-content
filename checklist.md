@@ -13,11 +13,12 @@
 | :heavy_check_mark: | Can visit a given url and save a screenshot           |
 | :heavy_check_mark: | Can navigate and capture each desired image           |
 | :heavy_check_mark: | Can be triggered via an API route                     |
-|                    | API usage is limited to authorized use                |
 | :heavy_check_mark: | Continuously runs, app starts on server re-start      |
-|                    | Captured images saved to bucket for other app use     |
-|                    | API can accept url and storage location parameters    |
+| :heavy_check_mark: | Captured images saved to bucket for other app use     |
+| :heavy_check_mark: | Delete excess files after copies saved to Storage.    |
+|                    | API usage is limited to authorized use                |
 |                    | **March 2020 Features Completed**                     |
+|                    | API can accept url and storage location parameters    |
 
 ## Checklist
 
@@ -31,7 +32,7 @@
 - [s] Stretch Goal. Not for current feature plan.
 
 Current Status:
-2020-04-03 15:18:11
+2020-04-07 23:30:38
 <!-- Ctrl-Shift-I to generate timestamp -->
 
 ### Structure & Resources
@@ -98,14 +99,19 @@ Current Status:
 - [x] Refactor local App technique to work in this environment.
 - [x] Returns a JSON Response with `success` boolean, and other information.
 - [x] Returns a JSON Response with `url` string of where the file is stored.
-- [ ] After images are stored in accessible location, `url` represents the location.
-- [ ] Can save to a static files bucket that can be used by other application.
+- [x] Update API: remove `url`, now returns `url_list` as a list of strings for urls for each file.
+- [x] Update API: `url` directs to the summary.txt file that also has the `url_list` content.
+- [x] Overwrite protection for Storage blob name, using a timestamp string prepended to file.
+- [x] Can save to a static files bucket that can be used by other application.
+- [x] Delete file copies on server after files are saved to Storage bucket.
+- [x] Returned urls in url_list accurately link to view the image files.
 - [x] Can be triggered by other application calling an API route.
-- [ ] URGENT Fix HTTPS self signing error.
-  - [ ] See readme link to `Apps to instances`
-  - [ ] Also see readme link to `VPC Firewall`
-- [ ] API can accept parameters for url and storage location.
+- [?] URGENT Fix HTTPS self signing error.
+  - [?] See readme development notes link to `Apps to instances`
+  - [?] Also see readme development link to `VPC Firewall`
+- [s] API can accept parameters for url and storage location.
 - [ ] API usage is limited to authorized use.
   - [?] Only works via backend routes?
   - [?] Utilize authorization set up via Google Cloud Platform.
   - [?] Set up authorization API keys
+- [ ] Confirm it works for Story Posts and for regular Posts.

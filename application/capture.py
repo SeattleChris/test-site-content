@@ -1,6 +1,7 @@
 from flask import flash, current_app as app
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
+from .errors import InvalidUsage
 import time
 import re
 from os import path
@@ -8,13 +9,12 @@ from os import path
 
 def chrome_grab(ig_url, filename):
     """ Using selenium webdriver with Chrome and grabing the file from the page content. """
-    # import chromedriver_binary  # Adds chromedriver binary to path
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--headless')
     options.add_argument("--remote-debugging-port=9222")
-    # options.binary_location = chromedriver_binary.chromedriver_filename
+    # options.binary_location = chromedriver.chromedriver_filename
     # chrome_executable_path = '/usr/bin/google-chrome'
     chromedriver_path = 'chromedriver' if app.config.get('LOCAL_ENV') else '/usr/bin/chromedriver'
     driver = webdriver.Chrome(chromedriver_path, chrome_options=options)
@@ -55,8 +55,7 @@ def chrome_grab(ig_url, filename):
     app.logger.debug(message)
     answer = {'success': success, 'message': message, 'file_list': files, 'error_files': error_files}
     # driver.close()  # Needed?
-    driver.quit()  # Needed?
-    # driver.exit()  # Needed?
+    driver.quit()  # Needed? or driver.exit()
     return answer
 
 
@@ -108,11 +107,11 @@ def soup_no_chrome(ig_url, filename):
     return answer
 
 
-def capture(url=None, post=None, filename='path/screenshot'):
+def capture(url, filename):
     """ Visits the permalink for give Post, creates a screenshot named the given filename. """
-    ig_url = post.permalink if post else 'https://www.instagram.com/p/B4dQzq8gukI/'
-    ig_url = url or ig_url
+    ig_url = url or 'https://www.instagram.com/p/B4dQzq8gukI/'
+    if not url or not filename:
+        raise InvalidUsage("You must have a url and a filename. ")
     answer = chrome_grab(ig_url, filename)
-    # answer = phantom_grab(ig_url, filename)
     # answer = soup_no_chrome(ig_url, filename)
     return answer
