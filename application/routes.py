@@ -1,15 +1,19 @@
 from flask import request, render_template, url_for, flash, jsonify, current_app as app
 from .capture import capture
 from .file_storage import setup_local_storage, move_captured_to_bucket, list_buckets, list_blobs
-from .errors import InvalidUsage
-# from flask import redirect, url_for, request, flash
 import simplejson as json
-import os
 import requests
 from pprint import pprint
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_DIR = os.path.join(BASE_DIR, 'save')
+TEST_ANSWER = {'success': True,
+               'message': 'Files Saved! ',
+               'file_list': ['/home/chris/newcode/test-site-content/save/post/1/faked_full.png',
+                             '/home/chris/newcode/test-site-content/save/post/1/faked_1.png',
+                             '/home/chris/newcode/test-site-content/save/post/1/faked_2.png',
+                             '/home/chris/newcode/test-site-content/save/post/1/faked_3.png'
+                             ],
+               'error_files': []
+               }
 
 
 @app.route('/')
@@ -47,35 +51,14 @@ def hello():
     removed_val = res.pop('SEND_FILE_MAX_AGE_DEFAULT', 'NOT FOUND')
     app.logger.debug(f"SEND_FILE_MAX_AGE_DEFAULT: {removed_val} ")
     app.logger.debug(json.dumps(res))
-    app.logger.debug(BASE_DIR)
     return jsonify(res)
-
-
-@app.route('/test')
-def test():
-    path = os.path.join(BASE_DIR, 'post')
-    path = os.path.join(BASE_DIR, 'test')
-    app.logger.debug(path)
-    try:
-        os.mkdir(path)
-        filename = path + '/testfile'
-    except FileExistsError as e:
-        app.logger.debug(f"Error in test: Directory already exists at {path} ")
-        app.logger.error(e)
-        filename = path + '/testfile_double'
-    except OSError as e:
-        app.logger.debug(f"Error in test function creating dir {path}")
-        app.logger.error(e)
-        raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
-    answer = capture(filename=filename)
-    return render_template('base.html', text=answer, results=answer, links=False)
 
 
 @app.route('/call')
 def call():
     test_ig = 'https://www.instagram.com/p/B4dQzq8gukI/'
     url = app.config.get('URL')
-    id = 2
+    id = 3
     media_type = 'faked'
     media_id = 1369
     api_url = f"{url}/api/v1/post/{str(id)}/{media_type}/{str(media_id)}/"
@@ -84,47 +67,22 @@ def call():
     app.logger.debug(api_url)
     app.logger.debug(payload)
     res = requests.get(api_url, params=payload)
-    app.logger.debug('---------- Our Call got back and object with dir: --------------------------')
-    pprint(dir(res))
-    app.logger.debug('--------------------------------------------------------')
+    app.logger.debug('---------- Our Call got back a response. --------------------------')
+    app.logger.debug(res.status_code)
     pprint(res.json())
-    return render_template('base.html', text=res.json(), results=res.json(), links=False)
+    return render_template('base.html', text=res.json(), results=res.json(), links='dict')
 
 
 @app.route('/api/v1/post/<int:id>/<string:media_type>/<int:media_id>/')
 def api(id, media_type, media_id):
     """ Save content and associate with Post, which may be a story or regular Post. """
-    # Passed as query string, we find it in request.args
-    # Passed as form, we find in request.form.to_dict(flat=True)
+    # Passed as query string, we find it in request.args. Passed as form, we find in request.form.to_dict(flat=True)
     ig_url = request.args.get('url')
     app.logger.debug('========== the API was called! ==========')
-    # make sure this is new post id, and make the id directory.
-    filename = setup_local_storage(id, media_type, media_id)
-    path = os.path.join(BASE_DIR, 'post')
-    # path = os.path.join(path, str(id))
-    # name = media_type.lower()
-    # try:
-    #     os.mkdir(path)
-    # except FileExistsError as e:
-    #     app.logger.debug(f"Error in test: Directory already exists at {path} ")
-    #     app.logger.error(e)
-    #     name += f"_{str(media_id)}"
-    # except OSError as e:
-    #     app.logger.debug(f"Error in test function creating dir {path} ")
-    #     app.logger.error(e)
-    #     raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
-    # filename = f"{str(path)}/{name}"
+    path, filename = setup_local_storage(id, media_type, media_id)
     app.logger.debug(filename)
-    answer = capture(url=ig_url, filename=filename)
-    # answer = {'success': True,
-    #           'message': 'Files Saved! ',
-    #           'file_list': ['/home/chris/newcode/test-site-content/save/post/1/faked_full.png',
-    #                         '/home/chris/newcode/test-site-content/save/post/1/faked_1.png',
-    #                         '/home/chris/newcode/test-site-content/save/post/1/faked_2.png',
-    #                         '/home/chris/newcode/test-site-content/save/post/1/faked_3.png'
-    #                         ],
-    #           'error_files': []
-    #           }
+    answer = capture(ig_url, filename)
+    # answer = TEST_ANSWER
     app.logger.debug('---------- Capture gave us an answer ----------')
     pprint(answer)
     answer = move_captured_to_bucket(answer, path, id)

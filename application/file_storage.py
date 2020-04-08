@@ -1,5 +1,5 @@
 
-from flask import flash, current_app as app
+from flask import current_app as app
 from google.cloud import storage
 from .errors import InvalidUsage
 from pprint import pprint
@@ -24,7 +24,8 @@ def setup_local_storage(id, media_type, media_id):
         app.logger.debug(f"Error in test function creating dir {path} ")
         app.logger.error(e)
         raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
-    return f"{str(path)}/{name}"
+    filename = f"{str(path)}/{name}"
+    return path, filename
 
 
 def list_buckets():
@@ -59,10 +60,6 @@ def upload_blob(source_file_name, destination_blob_name, bucket=default_bucket):
 def get_or_create_folder(folder, bucket=default_bucket):
     """ If folder does not exist, creates it. Returns a Blob object for this folder. """
     folder = f"posts/{str(folder)}"
-    # current_contents = list_blobs(bucket)
-    # app.logger.debug('====================== get or create folder: list of contents =====================')
-    # for ea in current_contents:
-    #     pprint(ea)
     blob = None
     try:
         blob = bucket.get_blob(folder)
