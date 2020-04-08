@@ -4,6 +4,7 @@ from google.cloud import storage
 from .errors import InvalidUsage
 from pprint import pprint
 import os
+import time
 
 gcs = storage.Client()
 default_bucket = gcs.get_bucket(app.config.get('CLOUD_STORAGE_BUCKET'))
@@ -73,6 +74,8 @@ def list_blobs(bucket):
 def upload_blob(source_file_name, destination_blob_name, bucket=default_bucket):
     """Uploads a file to the bucket by creating a blob and uploading the indicated file. """
     # Create a new blob for where to upload the file's content.
+    if bucket.get_blob(destination_blob_name):
+        destination_blob_name = f"{time.strftime('%Y%m%d-%H%M%S')}_{destination_blob_name}"
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename(source_file_name)  # blob.upload_from_file(source_file)
     blob.make_public()  # blob.make_private()
@@ -87,11 +90,10 @@ def summary_blob(url_list, destination_blob_folder, bucket=default_bucket):
     blob = bucket.get_blob(destination_blob_name)
     if blob:
         # read current data, then add data.
-        original = blob.download_as_string()
+        original = blob.download_as_string().decode()
         app.logger.debug('----------- Found existing summary blob ----------')
         pprint(original)
-        new_content = '\n'.join(url_list)
-        blob.upload_from_string(original + '/n' + new_content)
+        blob.upload_from_string(str(original) + '\n' + '\n'.join(url_list))
     else:
         blob = bucket.blob(destination_blob_name)
         blob.upload_from_string('\n'.join(url_list))
@@ -100,15 +102,15 @@ def summary_blob(url_list, destination_blob_folder, bucket=default_bucket):
 
 
 def get_or_create_blob_folder(folder_id, bucket=default_bucket):
-    """ If Storage bucket folder does not exist, creates it. Returns a Blob object for this folder. """
+    """ Deprecated. Does not seem needed for making and using folders or sub-folders.
+        If Storage bucket folder does not exist, creates it. Returns a Blob object for this folder.
+    """
     folder = f"posts/{str(folder_id)}"
     blob = None
     try:
         blob = bucket.get_blob(folder)
         if not blob:
             blob = bucket.blob(folder)
-            blob.upload_from_string('')
-            blob.make_public()
     except Exception as e:
         app.logger.debug('---------------------- get or create folder Exception ----------------------')
         pprint(e)
@@ -121,20 +123,17 @@ def move_captured_to_bucket(answer, path, folder_id):
     """ The answer is a dictionary response from capture.py. The folder_id is an integer directory to store blobs. """
     # answer = {'success': success, 'message': message, 'file_list': files, 'error_files': error_files}
     app.logger.debug('============================= Move Captured to Bucket ==============================')
-    folder = get_or_create_blob_folder(folder_id)
-    app.logger.debug(folder)
-    app.logger.debug('------------ Blob folder vars ------------')
-    pprint(vars(folder))
+    folder_name = f"posts/{str(folder_id)}"
     app.logger.debug('------------ List of Files ------------')
     files = answer.get('file_list', [])
     pprint(files)
     stored_urls = []
     for ea in files:
         _before, _orig, name = ea.partition(str(path) + '/')
-        blobname = f"{folder.name}/{name}"
+        blobname = f"{folder_name}/{name}"
         blob_url = upload_blob(ea, blobname)
         stored_urls.append(blob_url)
     answer['url_list'] = stored_urls
-    answer['url'] = summary_blob(stored_urls, folder.name)
+    answer['url'] = summary_blob(stored_urls, folder_name)
     answer = delete_local_files(answer, path)
     return answer
