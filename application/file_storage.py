@@ -81,8 +81,26 @@ def upload_blob(source_file_name, destination_blob_name, bucket=default_bucket):
     return blob.public_url
 
 
-def get_or_create_folder(folder_id, bucket=default_bucket):
-    """ If folder does not exist, creates it. Returns a Blob object for this folder. """
+def summary_blob(url_list, destination_blob_folder, bucket=default_bucket):
+    """Creates, or updates, a blob to hold a list of all the files in this blob directory. """
+    destination_blob_name = destination_blob_folder + '/summary.txt'
+    blob = bucket.get_blob(destination_blob_name)
+    if blob:
+        # read current data, then add data.
+        original = blob.download_as_string()
+        app.logger.debug('----------- Found existing summary blob ----------')
+        pprint(original)
+        new_content = '\n'.join(url_list)
+        blob.upload_from_string(original + '/n' + new_content)
+    else:
+        blob = bucket.blob(destination_blob_name)
+        blob.upload_from_string('\n'.join(url_list))
+    blob.make_public()
+    return blob.public_url
+
+
+def get_or_create_blob_folder(folder_id, bucket=default_bucket):
+    """ If Storage bucket folder does not exist, creates it. Returns a Blob object for this folder. """
     folder = f"posts/{str(folder_id)}"
     blob = None
     try:
@@ -99,21 +117,24 @@ def get_or_create_folder(folder_id, bucket=default_bucket):
     return blob
 
 
-def move_captured_to_bucket(answer, path, id):
-    """ The answer is a dictionary response from capture.py. The id is an integer directory to store blobs. """
+def move_captured_to_bucket(answer, path, folder_id):
+    """ The answer is a dictionary response from capture.py. The folder_id is an integer directory to store blobs. """
     # answer = {'success': success, 'message': message, 'file_list': files, 'error_files': error_files}
     app.logger.debug('============================= Move Captured to Bucket ==============================')
-    folder = get_or_create_folder(id)
+    folder = get_or_create_blob_folder(folder_id)
     app.logger.debug(folder)
+    app.logger.debug('------------ Blob folder vars ------------')
+    pprint(vars(folder))
     app.logger.debug('------------ List of Files ------------')
     files = answer.get('file_list', [])
     pprint(files)
     stored_urls = []
     for ea in files:
         _before, _orig, name = ea.partition(str(path) + '/')
-        blobname = f"{folder}/{name}"
+        blobname = f"{folder.name}/{name}"
         blob_url = upload_blob(ea, blobname)
         stored_urls.append(blob_url)
     answer['url_list'] = stored_urls
+    answer['url'] = summary_blob(stored_urls, folder.name)
     answer = delete_local_files(answer, path)
     return answer
