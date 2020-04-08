@@ -80,14 +80,14 @@ def api(id, media_type, media_id):
     ig_url = request.args.get('url')
     app.logger.debug('========== the API was called! ==========')
     path, filename = setup_local_storage(id, media_type, media_id)
-    app.logger.debug(filename)
+    # app.logger.debug(filename)
     answer = capture(ig_url, filename)
     # answer = TEST_ANSWER
-    app.logger.debug('---------- Capture gave us an answer ----------')
-    pprint(answer)
+    # app.logger.debug('---------- Capture gave us an answer ----------')
+    # pprint(answer)
     answer = move_captured_to_bucket(answer, path, id)
     app.logger.debug('---------- Move to Bucket gave us an answer ----------')
-    pprint(answer)
+    # pprint(answer)
     return jsonify(answer)
 
 

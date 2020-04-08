@@ -18,12 +18,12 @@ def setup_local_storage(id, media_type, media_id):
     try:
         os.mkdir(path)
     except FileExistsError as e:
-        app.logger.debug(f"Error in test: Directory already exists at {path} ")
-        app.logger.error(e)
+        # app.logger.debug(f"Error in test: Directory already exists at {path} ")
+        # app.logger.error(e)
         name += f"_{str(media_id)}"
     except OSError as e:
-        app.logger.debug(f"Error in test function creating dir {path} ")
-        app.logger.error(e)
+        # app.logger.debug(f"Error in test function creating dir {path} ")
+        # app.logger.error(e)
         raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
     filename = f"{str(path)}/{name}"
     return path, filename
@@ -59,7 +59,6 @@ def list_buckets():
     names = []
     for bucket in buckets:
         names.append(bucket.name)
-        pprint(dir(bucket))
     return names
 
 
@@ -73,9 +72,10 @@ def list_blobs(bucket):
 
 def upload_blob(source_file_name, destination_blob_name, bucket=default_bucket):
     """Uploads a file to the bucket by creating a blob and uploading the indicated file. """
+    # TODO: Bring back the overwrite protection of the next couple of lines.
+    # if bucket.get_blob(destination_blob_name):
+    #     destination_blob_name = f"{time.strftime('%Y%m%d-%H%M%S')}_{destination_blob_name}"
     # Create a new blob for where to upload the file's content.
-    if bucket.get_blob(destination_blob_name):
-        destination_blob_name = f"{time.strftime('%Y%m%d-%H%M%S')}_{destination_blob_name}"
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename(source_file_name)  # blob.upload_from_file(source_file)
     blob.make_public()  # blob.make_private()
@@ -122,11 +122,11 @@ def get_or_create_blob_folder(folder_id, bucket=default_bucket):
 def move_captured_to_bucket(answer, path, folder_id):
     """ The answer is a dictionary response from capture.py. The folder_id is an integer directory to store blobs. """
     # answer = {'success': success, 'message': message, 'file_list': files, 'error_files': error_files}
-    app.logger.debug('============================= Move Captured to Bucket ==============================')
+    # app.logger.debug('============================= Move Captured to Bucket ==============================')
     folder_name = f"posts/{str(folder_id)}"
-    app.logger.debug('------------ List of Files ------------')
+    # app.logger.debug('------------ List of Files ------------')
     files = answer.get('file_list', [])
-    pprint(files)
+    # pprint(files)
     stored_urls = []
     for ea in files:
         _before, _orig, name = ea.partition(str(path) + '/')

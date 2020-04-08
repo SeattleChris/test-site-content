@@ -18,7 +18,7 @@ def chrome_grab(ig_url, filename):
     # chrome_executable_path = '/usr/bin/google-chrome'
     chromedriver_path = 'chromedriver' if app.config.get('LOCAL_ENV') else '/usr/bin/chromedriver'
     driver = webdriver.Chrome(chromedriver_path, chrome_options=options)
-    app.logger.info("=========================== Set driver in chrome_grab ===========================")
+    # app.logger.info("=========================== Set driver in chrome_grab ===========================")
     files, error_files, message, count, error_count = [], [], '', 0, 0
     driver.get(ig_url)
     temp = f"{filename}_full.png"
@@ -29,7 +29,7 @@ def chrome_grab(ig_url, filename):
         error_files.append(temp)
         error_count += 1
         count -= 1
-    app.logger.debug(f"Start of count at {count + 1}. ")
+    # app.logger.debug(f"Start of count at {count + 1}. ")
     soup = bs(driver.page_source, 'html.parser')
     # TODO: Determine if we can do this without BeautifulSoup processes.
     target = [img.get('src') for img in soup.findAll('img') if not re.search("^\/", img.get('src'))]
@@ -49,10 +49,10 @@ def chrome_grab(ig_url, filename):
             message += f"Error on file # {count} . "
             error_count += 1
             error_files.append(temp)
-            app.logger.exception(e)
+            # app.logger.exception(e)
     success = error_count == 0
     message += 'Files Saved! ' if success else "Error in Screen Grab. "
-    app.logger.debug(message)
+    # app.logger.debug(message)
     answer = {'success': success, 'message': message, 'file_list': files, 'error_files': error_files}
     # driver.close()  # Needed?
     driver.quit()  # Needed? or driver.exit()
