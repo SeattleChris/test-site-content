@@ -40,8 +40,10 @@ Where [id] is a unique integer approved for associating for this specific post b
 JSON Response has the following properties:
 
 - `success`: True or False, if all the targeted images were found and recorded.
-- `url`: a string for where the files are saved, currently a local file directory.
+- `url_list`: a list of strings for each url of images that was saved to Storage buckets.
 - `file_list`: a list of strings representing the saved images for this job.
+- `error_files`: files that we could not capture, as a list of strings of the intended filename.
+- `deleted`: files, and directory, removed from GAE filesystem after saved to Storage bucket.
 - `message`: a string with additional information about this job.
 - `saved_media`: reserved, but not present in the response.
 - `post_model`: reserved, but not present in the response.
