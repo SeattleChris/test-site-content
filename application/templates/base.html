@@ -42,19 +42,37 @@
   <p>No text. </p>
   {% endif %}
   <hr />
-  {% if results %}
+  {% if results and results is mapping %}
   <ul>
-    {% for result in results %}
+    {% for key, value in results.items() %}
     <li>
-      {% if links == 'dict' %} {{result}}: {{results[result]}}
-      {% elif links %} <a href="{{result[1]}}">{{result[0]}}</a>
-      {% else %} {{result}}
+      {{key}}:
+      {% if value is iterable and value is not string %}
+      <ul>
+        {% for val in value %}
+        <li>{% if key == 'url_list' %}{{ val|urlize }}{% else %}{{val}}{% endif %}</li>
+        {% else %}
+        <li>&nbsp; NONE </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        {% if key == 'url' %}{{ value|urlize }}{% else %}{{value}}{% endif %}
       {% endif %}
     </li>
-    {% else %}
-    <li>Empty results. </li>
     {% endfor %}
   </ul>
+  {% elif results and results is iterable and results is not string %}
+  <ul>
+    {% for result in results %}
+    <li>{% if links %}<a href="{{result[1]}}">{{result[0]}}</a>{% else %}{{result}}{% endif %}</li>
+    {% else %}
+    <li>Empty List</li>
+    {% endfor %}
+  </ul>
+  {% elif results %}
+  <p> {{results}} </p>
+  {% else %}
+  <p> NO RESULTS </p>
   {% endif %}
 </main>
 {% endblock content %}
