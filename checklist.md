@@ -19,7 +19,7 @@
 |                    | API usage is limited to authorized use                |
 |                    | **March 2020 Features Completed**                     |
 |                    | Using GCP Tasks, digesting queue and updating DB      |
-|                    | DB records media file assoc, after files in Storage   |
+| :white_check_mark: | DB records media file assoc, after files in Storage   |
 |                    | API can accept url and storage location parameters    |
 
 ## Checklist
@@ -34,7 +34,7 @@
 - [s] Stretch Goal. Not for current feature plan.
 
 Current Status:
-2020-04-08 15:06:01
+2020-04-09 14:01:52
 <!-- Ctrl-Shift-I to generate timestamp -->
 
 ### Structure & Resources
@@ -83,6 +83,7 @@ Current Status:
 - [x] Setup initial application structure.
 - [ ] Can be called by the platform application.
   - [x] as an open route for an API call.
+  - [?] with auth on an open route.
   - [ ] through GCP using a service agent (more secure).
 
 ### Application
