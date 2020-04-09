@@ -18,13 +18,9 @@ def setup_local_storage(id, media_type, media_id):
     try:
         os.mkdir(path)
     except FileExistsError as e:
-        # app.logger.debug(f"Error in test: Directory already exists at {path} ")
-        # app.logger.error(e)
         name += f"_{str(media_id)}"
     except OSError as e:
-        # app.logger.debug(f"Error in test function creating dir {path} ")
-        # app.logger.error(e)
-        raise InvalidUsage('Route test OSError. ', status_code=501, payload=e)
+        raise InvalidUsage("OSError in setup_local_storage. ", status_code=501, payload=e)
     filename = f"{str(path)}/{name}"
     return path, filename
 
@@ -55,6 +51,7 @@ def delete_local_files(answer, path):
 
 
 def list_buckets():
+    """ List all buckets this app has access and awareness about. """
     buckets = gcs.list_buckets()
     names = []
     for bucket in buckets:
@@ -63,7 +60,7 @@ def list_buckets():
 
 
 def list_blobs(bucket):
-    """Lists all the blobs in a bucket. Input is is either a GCP bucket object, or a string of a bucket name. """
+    """ Lists all the blobs in a bucket. Input is is either a GCP bucket object, or a string of a bucket name. """
     bucket = default_bucket if bucket is None else bucket
     bucket_name = bucket if isinstance(bucket, str) else bucket.name
     blobs = gcs.list_blobs(bucket_name)
@@ -71,8 +68,8 @@ def list_blobs(bucket):
 
 
 def upload_blob(source_file_name, destination_blob_name, bucket=default_bucket):
-    """Uploads a file to the bucket by creating a blob and uploading the indicated file. """
-    # TODO: Save time over following Blob name check?
+    """ Uploads a file to the bucket by creating a blob and uploading the indicated file. """
+    # TODO: Save time compared to the following code of Blob name check?
     if bucket.get_blob(destination_blob_name):
         timestamp = time.strftime('%Y%m%d-%H%M%S')
         blob_name, seperator, file_ext = destination_blob_name.rpartition('.')
@@ -87,7 +84,9 @@ def upload_blob(source_file_name, destination_blob_name, bucket=default_bucket):
 
 
 def summary_blob(url_list, destination_blob_folder, bucket=default_bucket):
-    """Creates, or updates, a blob to hold a list of all the files in this blob directory. """
+    """ Deprecated. This is no longer required for our API response.
+        Creates, or updates, a blob to hold a list of all the files in this blob directory.
+    """
     destination_blob_name = destination_blob_folder + '/summary.txt'
     blob = bucket.get_blob(destination_blob_name)
     if blob:
@@ -123,12 +122,10 @@ def get_or_create_blob_folder(folder_id, bucket=default_bucket):
 
 def move_captured_to_bucket(answer, path, folder_id):
     """ The answer is a dictionary response from capture.py. The folder_id is an integer directory to store blobs. """
-    # answer = {'success': success, 'message': message, 'file_list': files, 'error_files': error_files}
-    # app.logger.debug('============================= Move Captured to Bucket ==============================')
+    # answer = {'success': True|False, 'message': 'some text. ', 'file_list': [], 'error_files': []}
+    # Below will add answer['url_list'] and answer['deleted] which are both lists.
     folder_name = f"posts/{str(folder_id)}"
-    # app.logger.debug('------------ List of Files ------------')
     files = answer.get('file_list', [])
-    # pprint(files)
     stored_urls = []
     for ea in files:
         _before, _orig, name = ea.partition(str(path) + '/')
@@ -136,6 +133,6 @@ def move_captured_to_bucket(answer, path, folder_id):
         blob_url = upload_blob(ea, blobname)
         stored_urls.append(blob_url)
     answer['url_list'] = stored_urls
-    answer['url'] = summary_blob(stored_urls, folder_name)
+    # answer['url'] = summary_blob(stored_urls, folder_name)
     answer = delete_local_files(answer, path)
     return answer

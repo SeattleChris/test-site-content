@@ -56,6 +56,7 @@ def hello():
 
 @app.route('/call')
 def call():
+    """ Route used for development testing the API response. """
     test_ig = 'https://www.instagram.com/p/B4dQzq8gukI/'
     url = app.config.get('URL')
     id = 3
@@ -80,7 +81,6 @@ def api(id, media_type, media_id):
     ig_url = request.args.get('url')
     app.logger.debug('========== the API was called! ==========')
     path, filename = setup_local_storage(id, media_type, media_id)
-    # app.logger.debug(filename)
     answer = capture(ig_url, filename)
     # answer = TEST_ANSWER
     # app.logger.debug('---------- Capture gave us an answer ----------')

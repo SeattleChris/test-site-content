@@ -49,13 +49,12 @@ def chrome_grab(ig_url, filename):
             message += f"Error on file # {count} . "
             error_count += 1
             error_files.append(temp)
-            # app.logger.exception(e)
+            app.logger.exception(e)
     success = error_count == 0
     message += 'Files Saved! ' if success else "Error in Screen Grab. "
     # app.logger.debug(message)
     answer = {'success': success, 'message': message, 'file_list': files, 'error_files': error_files}
-    # driver.close()  # Needed?
-    driver.quit()  # Needed? or driver.exit()
+    driver.quit()  # driver.close() to close tab? driver.exit() to end browser?
     return answer
 
 

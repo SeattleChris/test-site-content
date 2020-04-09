@@ -2,6 +2,15 @@
 
 Notes and documentation resources considered in developing this application.
 
+
+## Older API
+
+API version 0.1.0 had a the following included in its JSON response:
+
+``` Markdown
+- `url`: a string url to the Storage bucket summary.txt file that also has the `url_list` content.
+```
+
 ## Serverless VPC Access
 
 Connecting a Google App Engine (GAE) application to this test-site-content application (on GAE-Flex) without a publicly open route, through the Google Cloud Platform. This Serverless VPC Access is based on a resource called a *connector*. The GAE app will use the connector for internal network traffic to the GCE.
@@ -39,6 +48,7 @@ If hosting as App Engine - Flex environment (which is also GCE under the hood):
 - [GAE Flex setup](https://cloud.google.com/appengine/docs/flexible/python/runtime)
 - [SSH to GAE-Flex](https://cloud.google.com/appengine/docs/flexible/python/debugging-an-instance)
 - [Warmup Requests](https://cloud.google.com/appengine/docs/standard/python3/configuring-warmup-requests)
+- [Storage as Filesystem](https://cloud.google.com/storage/docs/gcs-fuse#using)
 
 Other Related Documentation:
 
