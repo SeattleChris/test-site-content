@@ -16,7 +16,12 @@ Dockerfile
 .git
 .hg
 .svn
+notes.md
+Pipfile
+Pipfile.lock
+.env
 .git/
+env/
 tests/
 .vscode/
 __pycache__/

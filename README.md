@@ -3,7 +3,7 @@
 Used to confirm the expected content was published and available online at a given time. This is useful for sites that expire the content after a certain time frame.
 
 **Author**: Chris L Chapman
-**Version**: 0.1.0
+**Version**: 0.2.0
 
 ## Architecture
 
@@ -42,7 +42,6 @@ JSON Response has the following properties:
 
 - `success`: True or False, if all the targeted images were found and recorded.
 - `url_list`: a list of strings for each url of images that was saved to Storage buckets.
-- `url`: a string url to the Storage bucket summary.txt file that also has the `url_list` content.
 - `file_list`: a list of strings representing the saved images for this job.
 - `error_files`: files that we could not capture, as a list of strings of the intended filename.
 - `deleted`: files, and directory, removed from GAE filesystem after saved to Storage bucket.
