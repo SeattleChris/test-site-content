@@ -6,9 +6,11 @@ import time
 import re
 from os import path
 
+# VALID_POST_TYPE = {'STORY': True}
 
-def chrome_grab(ig_url, filename):
-    """ Using selenium webdriver with Chrome and grabing the file from the page content. """
+
+def setup_chromedriver():
+    """ Returns a driver object to be used for navigating websites. """
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
@@ -17,8 +19,13 @@ def chrome_grab(ig_url, filename):
     # options.binary_location = chromedriver.chromedriver_filename
     # chrome_executable_path = '/usr/bin/google-chrome'
     chromedriver_path = 'chromedriver' if app.config.get('LOCAL_ENV') else '/usr/bin/chromedriver'
-    driver = webdriver.Chrome(chromedriver_path, chrome_options=options)
+    driver = webdriver.Chrome(chromedriver_path, options=options)
     # app.logger.info("=========================== Set driver in chrome_grab ===========================")
+    return driver
+
+
+def capture_img(ig_url, filename, driver):
+    """ For a given page, capture the images in the img tags. """
     files, error_files, message, count, error_count = [], [], '', 0, 0
     driver.get(ig_url)
     temp = f"{filename}_full.png"
@@ -54,11 +61,31 @@ def chrome_grab(ig_url, filename):
     message += 'Files Saved! ' if success else "Error in Screen Grab. "
     # app.logger.debug(message)
     answer = {'success': success, 'message': message, 'file_list': files, 'error_files': error_files}
+    return answer
+
+
+def story_click(driver):
+    """ Do the necessary browser actions for a story post. """
+    # all_buttons = driver.find_elements_by_tag_name('button')
+    success = False
+    return driver, success
+
+
+def chrome_grab(ig_url, filename, post_type):
+    """ Using selenium webdriver with Chrome and grabing the file from the page content. """
+    driver = setup_chromedriver()
+    driver.get(ig_url)
+    success = True
+    if post_type == 'STORY':
+        success = False
+        driver, success = story_click(driver)
+    if success:
+        answer = capture_img(ig_url, filename, driver)
     driver.quit()  # driver.close() to close tab? driver.exit() to end browser?
     return answer
 
 
-def soup_no_chrome(ig_url, filename):
+def soup_no_chrome(ig_url, filename, post_type):
     """ If possible, approach that does not require a browser emulation.
         If the page is a react app, or depends on javascript, this probably won't work.
     """
@@ -106,11 +133,14 @@ def soup_no_chrome(ig_url, filename):
     return answer
 
 
-def capture(url, filename):
+def capture(url, filename, post_type='STORY'):
     """ Visits the permalink for give Post, creates a screenshot named the given filename. """
+    if not isinstance(post_type, str):
+        raise InvalidUsage("The post_type must be a string. ")
+    post_type = post_type.upper()
     ig_url = url or 'https://www.instagram.com/p/B4dQzq8gukI/'
     if not url or not filename:
         raise InvalidUsage("You must have a url and a filename. ")
-    answer = chrome_grab(ig_url, filename)
-    # answer = soup_no_chrome(ig_url, filename)
+    answer = chrome_grab(ig_url, filename, post_type)
+    # answer = soup_no_chrome(ig_url, filename, post_type)
     return answer
