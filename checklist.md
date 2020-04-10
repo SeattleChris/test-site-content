@@ -1,4 +1,4 @@
-# Feature Development Plan for March 2020 - ver 0.0.1
+# Feature Development Plan for March 2020 - ver 0.0.4
 
 ## Milestones
 
@@ -16,11 +16,13 @@
 | :heavy_check_mark: | Continuously runs, app starts on server re-start      |
 | :heavy_check_mark: | Captured images saved to bucket for other app use     |
 | :heavy_check_mark: | Delete excess files after copies saved to Storage.    |
-|                    | API usage is limited to authorized use                |
+|                    | API usage is limited to authorized use.               |
 |                    | **March 2020 Features Completed**                     |
+|                    | Extra browser navigation for Story Posts is resolved. |
+|                    | Instagram Login as needed for viewing Story Posts.    |
 |                    | Using GCP Tasks, digesting queue and updating DB      |
-| :white_check_mark: | DB records media file assoc, after files in Storage   |
-|                    | API can accept url and storage location parameters    |
+| :heavy_check_mark: | DB records media file assoc, after files in Storage   |
+| :white_check_mark: | API can accept url and storage location parameters    |
 
 ## Checklist
 
@@ -34,7 +36,7 @@
 - [s] Stretch Goal. Not for current feature plan.
 
 Current Status:
-2020-04-09 14:01:52
+2020-04-10 02:23:40
 <!-- Ctrl-Shift-I to generate timestamp -->
 
 ### Structure & Resources
