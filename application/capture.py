@@ -67,7 +67,17 @@ def capture_img(ig_url, filename, driver):
 def story_click(driver):
     """ Do the necessary browser actions for a story post. """
     # all_buttons = driver.find_elements_by_tag_name('button')
-    success = False
+    try:
+        desired_div_inside_button = driver.find_element_by_xpath("//button/descendant::div[text()='Tap to play']")
+        target_button = desired_div_inside_button.find_element_by_xpath("ancestor::button")
+        target_button.click()
+        success = True
+        # ? TODO: Emulate clicking in text box to freeze image? //textarea[@placeholder='Send Message']
+        # time.sleep(1)  # No pause so we get the screen shot better?
+    except Exception as e:
+        success = False
+        app.logger.debug("Exception in story_click. ")
+        app.logger.exception(e)
     return driver, success
 
 
