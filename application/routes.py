@@ -57,11 +57,13 @@ def hello():
 @app.route('/call')
 def call():
     """ Route used for development testing the API response. """
-    test_ig = 'https://www.instagram.com/p/B4dQzq8gukI/'
+    # test_ig = 'https://www.instagram.com/p/B4dQzq8gukI/'
+    test_ig = 'https://www.instagram.com/stories/chip.reno/2283954400575747388/'
+    # https://dev-dot-engaged-builder-257615.appspot.com/data/capture/1946
     url = app.config.get('URL')
-    id = 3
-    media_type = 'faked'
-    media_id = 4213
+    id = 4
+    media_type = 'STORY'
+    media_id = 1946
     api_url = f"{url}/api/v1/post/{str(id)}/{media_type}/{str(media_id)}/"
     payload = {'url': test_ig}
     app.logger.debug('========== Making a requests to our own API. ===========')
@@ -70,6 +72,7 @@ def call():
     res = requests.get(api_url, params=payload)
     app.logger.debug('---------- Our Call got back a response. --------------------------')
     app.logger.debug(f"Status code: {res.status_code} ")
+    # pprint(dir(res))
     pprint(res.json())
     return render_template('base.html', text=res.json().get('message', 'NO MESSAGE'), results=res.json(), links='dict')
 
@@ -81,13 +84,13 @@ def api(id, media_type, media_id):
     ig_url = request.args.get('url')
     app.logger.debug('========== the API was called! ==========')
     path, filename = setup_local_storage(id, media_type, media_id)
-    answer = capture(ig_url, filename)
+    answer = capture(ig_url, filename, media_type=media_type.upper())
     # answer = TEST_ANSWER
     # app.logger.debug('---------- Capture gave us an answer ----------')
     # pprint(answer)
     answer = move_captured_to_bucket(answer, path, id)
     app.logger.debug('---------- Move to Bucket gave us an answer ----------')
-    # pprint(answer)
+    pprint(answer)
     return jsonify(answer)
 
 
