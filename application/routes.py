@@ -59,7 +59,7 @@ def hello():
 def call(media_type):
     """ Route used for development testing the API response. """
     default_ig_url = 'https://www.instagram.com/p/B4dQzq8gukI/'
-    story_url = 'https://www.instagram.com/stories/chip.reno/2283954400575747388/'
+    story_url = 'https://www.instagram.com/stories/noellereno/2284310497111265707/'
     default_url = story_url if media_type.upper() == 'STORY' else default_ig_url
     ig_url = request.args.get('url', default_url)
     app.logger.debug(f"Testing media type {media_type} call with IG url: ")

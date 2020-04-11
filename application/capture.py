@@ -110,8 +110,8 @@ def story_click(driver):
             # TODO: Maybe try a different approach for our target.
             target_button = driver.find_element_by_xpath("//button[@type='button']")
             app.logger.debug('*@*@*@*@*@*@*@*@*@*@*@*@*@*@* TARGET BUTTON *@*@*@*@*@*@*@*@*@*@*@*@*@*@*')
-            pprint(dir(target_button))
-            app.logger.debug('-------------------------------------------------------------------------')
+            # pprint(dir(target_button))
+            # app.logger.debug('-------------------------------------------------------------------------')
             pprint(vars(target_button))
             success = True
         except NoSuchElementException as e:
@@ -186,7 +186,6 @@ def chrome_grab(ig_url, filename, media_type, headless=True):
         success = False
         driver, success = story_click(driver)
         app.logger.debug(f"========== story_click response: {success} ==========")
-        pprint(dir(driver))
     if success:
         answer = capture_img(filename, driver)
         app.logger.debug("------ capture_img gave a response ------")
