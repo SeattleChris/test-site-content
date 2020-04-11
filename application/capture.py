@@ -15,15 +15,16 @@ IG_EMAIL = app.config.get('IG_EMAIL')
 IG_PASSWORD = app.config.get('IG_PASSWORD')
 
 
-def setup_chromedriver():
+def setup_chromedriver(headless=True):
     """ Returns a driver object to be used for navigating websites. """
     options = webdriver.ChromeOptions()
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--headless')
-    options.add_argument("--remote-debugging-port=9222")
-    # options.binary_location = chromedriver.chromedriver_filename
-    # chrome_executable_path = '/usr/bin/google-chrome'
+    if headless:
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--headless')
+        options.add_argument("--remote-debugging-port=9222")
+        # options.binary_location = chromedriver.chromedriver_filename
+        # chrome_executable_path = '/usr/bin/google-chrome'
     chromedriver_path = 'chromedriver' if app.config.get('LOCAL_ENV') else '/usr/bin/chromedriver'
     driver = webdriver.Chrome(chromedriver_path, options=options)
     app.logger.info("=========================== Setup chrome driver ===========================")
@@ -106,6 +107,7 @@ def story_click(driver):
     while attempts and not success:
         attempts -= 1
         try:
+            # TODO: Maybe try a different approach for our target.
             target_button = driver.find_element_by_xpath("//button[@type='button']")
             app.logger.debug('*@*@*@*@*@*@*@*@*@*@*@*@*@*@* TARGET BUTTON *@*@*@*@*@*@*@*@*@*@*@*@*@*@*')
             pprint(dir(target_button))
@@ -130,9 +132,10 @@ def story_click(driver):
     return driver, success
 
 
-def ig_login(driver, ig_email=IG_EMAIL, ig_password=IG_PASSWORD):
+def ig_login(driver, current_page=True, ig_email=IG_EMAIL, ig_password=IG_PASSWORD):
     """ Login to Instagram. This is required to view Story posts. """
-    driver.get('https://www.instagram.com/accounts/login/')
+    if not current_page:
+        driver.get('https://www.instagram.com/accounts/login/')
     wait('quick')  # Let the page finish loading.
     app.logger.debug('============== InstaGram Login ===================')
     attempts, form_inputs = 5, []
@@ -166,18 +169,19 @@ def ig_login(driver, ig_email=IG_EMAIL, ig_password=IG_PASSWORD):
     return driver, success
 
 
-def chrome_grab(ig_url, filename, media_type):
+def chrome_grab(ig_url, filename, media_type, headless=True):
     """ Using selenium webdriver with Chrome and grabing the file from the page content. """
-    app.logger.debug('================= chrome_grab ================')
-    driver = setup_chromedriver()
+    # headless = False  # TODO: Usually set as True. Only set to False to visually watch when running locally.
+    app.logger.debug(f"================= chrome_grab with headless as {headless} ================")
+    driver = setup_chromedriver(headless=headless)
     success, answer = True, {}
+    driver.get(ig_url)
     if media_type == 'STORY':
-        driver, success = ig_login(driver)
+        driver, success = ig_login(driver, current_page=True)
         if success:
             app.logger.debug('We have an InstaGram login. ')
         else:
             app.logger.debug("The IG login FAILED! ")
-    driver.get(ig_url)
     if media_type == 'STORY' and success:
         success = False
         driver, success = story_click(driver)

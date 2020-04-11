@@ -61,7 +61,7 @@ def call():
     test_ig = 'https://www.instagram.com/stories/chip.reno/2283954400575747388/'
     # https://dev-dot-engaged-builder-257615.appspot.com/data/capture/1946
     url = app.config.get('URL')
-    id = 5
+    id = 6
     media_type = 'STORY'
     media_id = 1946
     api_url = f"{url}/api/v1/post/{str(id)}/{media_type}/{str(media_id)}/"

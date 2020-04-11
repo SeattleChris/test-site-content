@@ -36,7 +36,7 @@
 - [s] Stretch Goal. Not for current feature plan.
 
 Current Status:
-2020-04-10 02:23:40
+2020-04-10 19:29:10
 <!-- Ctrl-Shift-I to generate timestamp -->
 
 ### Structure & Resources
@@ -125,4 +125,4 @@ Current Status:
   - [?] Only works via backend routes?
   - [?] Utilize authorization set up via Google Cloud Platform.
   - [?] Set up authorization API keys
-- [ ] Confirm it works for Story Posts and for regular Posts.
+- [x] Confirm it works for Story Posts and for regular Posts.
