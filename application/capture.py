@@ -1,13 +1,18 @@
 from flask import flash, current_app as app
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from .errors import InvalidUsage
 import time
 import re
 from os import path
+from random import randint
 from pprint import pprint
+
 # VALID_POST_TYPE = {'STORY': True}
+IG_EMAIL = app.config.get('IG_EMAIL')
+IG_PASSWORD = app.config.get('IG_PASSWORD')
 
 
 def setup_chromedriver():
@@ -37,7 +42,7 @@ def capture_img(filename, driver):
         error_files.append(temp)
         error_count += 1
         count -= 1
-    app.logger.debug(f"Start of count at {count + 1}. ")
+    app.logger.debug(f"Start of count at {count + 1}. Successful screenshot: {success}. ")
     soup = bs(driver.page_source, 'html.parser')
     # TODO: Determine if we can do this without BeautifulSoup processes.
     target = [img.get('src') for img in soup.findAll('img') if not re.search("^\/", img.get('src'))]
@@ -73,13 +78,15 @@ def story_click(driver):
     # desired_div_inside_button = driver.find_element_by_xpath("//button/descendant::div[contains(., 'Tap to play')]")
     # target_button = desired_div_inside_button.find_element_by_xpath("ancestor::button")
     attempts, success = 5, False
-    time.sleep(1.5)  # Let the page finish loading.
+    time.sleep(4.2)  # Let the page finish loading.
     while attempts and not success:
         attempts -= 1
         try:
             target_button = driver.find_element_by_xpath("//button[@type='button']")
             app.logger.debug('*@*@*@*@*@*@*@*@*@*@*@*@*@*@* TARGET BUTTON *@*@*@*@*@*@*@*@*@*@*@*@*@*@*')
-            pprint(target_button)
+            pprint(dir(target_button))
+            app.logger.debug('-------------------------------------------------------------------------')
+            pprint(vars(target_button))
             success = True
         except NoSuchElementException as e:
             app.logger.debug(f"Exception for target_button: {attempts} left. ")
@@ -88,15 +95,50 @@ def story_click(driver):
             else:
                 time.sleep(1.5)
         except Exception as e:
-            success = False
             app.logger.debug("Exception in story_click. ")
             app.logger.exception(e)
+            driver.quit()
             raise e
     if success:
         target_button.click()
-        time.sleep(2.5)
+        time.sleep(4.3)
     # ? TODO: Emulate clicking in text box to freeze image? //textarea[@placeholder='Send Message']
-    # time.sleep(1)  # No pause so we get the screen shot better?
+    return driver, success
+
+
+def ig_login(driver, ig_email=IG_EMAIL, ig_password=IG_PASSWORD):
+    """ Login to Instagram. This is required to view Story posts. """
+    driver.get('https://www.instagram.com/accounts/login/')
+    time.sleep(0.1)  # Let the page finish loading.
+    app.logger.debug('============== InstaGram Login ===================')
+    attempts, form_inputs = 5, []
+    while attempts and not form_inputs:
+        attempts -= 1
+        try:
+            form_inputs = driver.find_elements_by_css_selector('form input')
+            if not form_inputs:
+                raise NoSuchElementException('Not yet. ')
+            app.logger.debug(f"Form inputs found! On Attempt: {5 - attempts} ")
+            pprint(form_inputs)
+        except NoSuchElementException as e:
+            app.logger.debug(f"Exception for target_button: {attempts} left. ")
+            if not attempts:
+                app.logger.exception(e)
+            else:
+                time.sleep(0.2)
+        except Exception as e:
+            app.logger.debug("Exception in ig_login. ")
+            app.logger.exception(e)
+            driver.quit()
+            raise e
+    if form_inputs:
+        app.logger.debug(f"We have {len(form_inputs)} input fields. ")
+        email_input = form_inputs[0]
+        password_input = form_inputs[1]
+        email_input.send_keys(ig_email)
+        password_input.send_keys(ig_password)
+        password_input.send_keys(Keys.ENTER)
+    success = len(form_inputs) > 0
     return driver, success
 
 
@@ -104,9 +146,16 @@ def chrome_grab(ig_url, filename, media_type):
     """ Using selenium webdriver with Chrome and grabing the file from the page content. """
     app.logger.debug('================= chrome_grab ================')
     driver = setup_chromedriver()
-    driver.get(ig_url)
     success, answer = True, {}
     if media_type == 'STORY':
+        driver, success = ig_login(driver)
+        if success:
+            app.logger.debug('We have an InstaGram login. ')
+            time.sleep(1.0)
+        else:
+            app.logger.debug("The IG login FAILED! ")
+    driver.get(ig_url)
+    if media_type == 'STORY' and success:
         success = False
         driver, success = story_click(driver)
         app.logger.debug(f"========== story_click response: {success} ==========")

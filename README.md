@@ -7,7 +7,7 @@ Used to confirm the expected content was published and available online at a giv
 
 ## Architecture
 
-Designed to be deployed on Google Cloud Platform, using:
+To view and test InstaGram Story posts, login credentials for an Instagram account are needed. This application is designed to be deployed on Google Cloud Platform, using:
 
 Core packages required for this application:
 
