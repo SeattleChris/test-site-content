@@ -30,11 +30,13 @@ def setup_chromedriver():
     return driver
 
 
-def capture_img(filename, driver):
+def capture_img(filename, driver, media_type=''):
     """ For a given page, capture the images in the img tags. """
     app.logger.debug('================= capture_img =====================')
     files, error_files, message, count, error_count = [], [], '', 0, 0
+    dur = 'short' if media_type == 'STORY' else 'quick'
     temp = f"{filename}_full.png"
+    wait(dur)
     success = driver.save_screenshot(temp)
     if success:
         files.append(temp)
@@ -48,10 +50,10 @@ def capture_img(filename, driver):
     target = [img.get('src') for img in soup.findAll('img') if not re.search("^\/", img.get('src'))]
     for ea in target:
         count += 1
-        time.sleep(1.1)
         temp = f"{filename}_{count}.png"
         try:
             driver.get(ea)
+            wait(dur)
             success = driver.save_screenshot(temp)
             # capture_screenshot_to_string()
             # driver.get_screenshot_as_base64()
@@ -70,6 +72,28 @@ def capture_img(filename, driver):
     return answer
 
 
+def wait(val):
+    """ Adds a time.sleep period. Input can either be a float or a string matching our semantic duration lables. """
+
+    def _r(a, b):
+        """ Inputs are measured in tenths of a second. Output is a float value measured in seconds. """
+        return randint(a * 100, b * 100) / 1000  # in Python 3, always returns a float.
+
+    semantic_duration = {'quick': _r(1, 8), 'short': _r(11, 17), 'med': _r(19, 31), 'long': _r(41, 55)}
+    if isinstance(val, (int, float)):
+        val = max(0.06, val)
+        a = ((val * 0.95) + (val - 0.1)) / 2
+        b = ((val * 1.05) + (val + 0.1)) / 2
+        val = _r(a, b)
+    elif isinstance(val, str) and val in semantic_duration:
+        val = semantic_duration[val]
+    else:
+        raise ValueError(f"The wait function input of {val} was not a number or correct semantic string value. ")
+
+    time.sleep(val)
+    return True
+
+
 def story_click(driver):
     """ Do the necessary browser actions for a story post. """
     app.logger.debug('============== story_click ================')
@@ -77,8 +101,8 @@ def story_click(driver):
     # desired_div_inside_button = driver.find_element_by_xpath("//button/descendant::div[text()='Tap to play']")
     # desired_div_inside_button = driver.find_element_by_xpath("//button/descendant::div[contains(., 'Tap to play')]")
     # target_button = desired_div_inside_button.find_element_by_xpath("ancestor::button")
+    wait('long')  # Let the page finish loading.
     attempts, success = 5, False
-    time.sleep(4.2)  # Let the page finish loading.
     while attempts and not success:
         attempts -= 1
         try:
@@ -93,7 +117,7 @@ def story_click(driver):
             if not attempts:
                 app.logger.exception(e)
             else:
-                time.sleep(1.5)
+                wait('quick')
         except Exception as e:
             app.logger.debug("Exception in story_click. ")
             app.logger.exception(e)
@@ -101,7 +125,7 @@ def story_click(driver):
             raise e
     if success:
         target_button.click()
-        time.sleep(4.3)
+        wait('long')
     # ? TODO: Emulate clicking in text box to freeze image? //textarea[@placeholder='Send Message']
     return driver, success
 
@@ -109,7 +133,7 @@ def story_click(driver):
 def ig_login(driver, ig_email=IG_EMAIL, ig_password=IG_PASSWORD):
     """ Login to Instagram. This is required to view Story posts. """
     driver.get('https://www.instagram.com/accounts/login/')
-    time.sleep(0.1)  # Let the page finish loading.
+    wait('quick')  # Let the page finish loading.
     app.logger.debug('============== InstaGram Login ===================')
     attempts, form_inputs = 5, []
     while attempts and not form_inputs:
@@ -125,7 +149,7 @@ def ig_login(driver, ig_email=IG_EMAIL, ig_password=IG_PASSWORD):
             if not attempts:
                 app.logger.exception(e)
             else:
-                time.sleep(0.2)
+                wait('quick')
         except Exception as e:
             app.logger.debug("Exception in ig_login. ")
             app.logger.exception(e)
@@ -151,7 +175,6 @@ def chrome_grab(ig_url, filename, media_type):
         driver, success = ig_login(driver)
         if success:
             app.logger.debug('We have an InstaGram login. ')
-            time.sleep(1.0)
         else:
             app.logger.debug("The IG login FAILED! ")
     driver.get(ig_url)
