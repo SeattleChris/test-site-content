@@ -19,7 +19,8 @@
       <li><a href="{{ url_for('bucket_list') }}">List Buckets</a></li>
       <li><a href="{{ url_for('hello') }}">Hello</a></li>
       <li><a href="{{ url_for('blob_list', bucket_name='default') }}">List Blobs</a></li>
-      <li><a href="{{ url_for('call') }}">Call</a></li>
+      <li><a href="{{ url_for('call', media_type='STORY') }}">Call for Story Post</a></li>
+      <li><a href="{{ url_for('call', media_type='faked') }}">Call for Regular Post</a></li>
     </ul>
   </nav>
 {% endblock header %}
@@ -79,8 +80,9 @@
 <footer>
   <p>
     <a href="{{ url_for('home')}}">Home</a> |
+    <a href="{{ url_for('call', media_type='FAKED') }}">Call for faked Post</a> |
     <a href="{{ url_for('blob_list', bucket_name='default') }}">List Blobs</a> |
-    <a href="{{ url_for('call') }}">Call</a>
+    <a href="{{ url_for('call', media_type='story') }}">Call for Story Post</a>
   </p>
 </footer>
 </body>
