@@ -1,6 +1,7 @@
 from flask import request, render_template, url_for, flash, jsonify, current_app as app
 from .capture import capture
 from .file_storage import setup_local_storage, move_captured_to_bucket, list_buckets, list_blobs
+from .errors import InvalidUsage
 import simplejson as json
 import requests
 from pprint import pprint
@@ -54,25 +55,28 @@ def hello():
     return jsonify(res)
 
 
-@app.route('/call')
-def call():
+@app.route('/call/<string:media_type>/')
+def call(media_type):
     """ Route used for development testing the API response. """
-    # test_ig = 'https://www.instagram.com/p/B4dQzq8gukI/'
-    test_ig = 'https://www.instagram.com/stories/chip.reno/2283954400575747388/'
-    # https://dev-dot-engaged-builder-257615.appspot.com/data/capture/1946
+    default_ig_url = 'https://www.instagram.com/p/B4dQzq8gukI/'
+    story_url = 'https://www.instagram.com/stories/noellereno/2284310497111265707/'
+    default_url = story_url if media_type.upper() == 'STORY' else default_ig_url
+    ig_url = request.args.get('url', default_url)
+    app.logger.debug(f"Testing media type {media_type} call with IG url: ")
+    app.logger.debug(ig_url)
     url = app.config.get('URL')
-    id = 6
-    media_type = 'STORY'
+    id = 7
     media_id = 1946
     api_url = f"{url}/api/v1/post/{str(id)}/{media_type}/{str(media_id)}/"
-    payload = {'url': test_ig}
+    payload = {'url': ig_url}
     app.logger.debug('========== Making a requests to our own API. ===========')
     app.logger.debug(api_url)
     app.logger.debug(payload)
     res = requests.get(api_url, params=payload)
     app.logger.debug('---------- Our Call got back a response. --------------------------')
     app.logger.debug(f"Status code: {res.status_code} ")
-    # pprint(dir(res))
+    if res.status_code == 500:
+        raise InvalidUsage('The test call got a 500 status code. ', payload=res)
     pprint(res.json())
     return render_template('base.html', text=res.json().get('message', 'NO MESSAGE'), results=res.json(), links='dict')
 
