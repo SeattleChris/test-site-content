@@ -100,7 +100,7 @@ def api_0(id, media_type, media_id):
 
 
 @app.route('/api/v1/post/<string:media_type>/<int:media_id>/')
-def api(id, media_type, media_id):
+def api(media_type, media_id):
     """ Save content and associate with Post, which may be a story or regular Post. """
     # Passed as query string, we find it in request.args. Passed as form, we find in request.form.to_dict(flat=True)
     # Passed as POST we find the payload in the body.
@@ -108,14 +108,19 @@ def api(id, media_type, media_id):
     app.logger.debug('========== the API was called! ==========')
     path, filename = setup_local_storage(media_type, media_id)
     answer = capture(ig_url, filename, media_type=media_type.upper())
-    # answer = TEST_ANSWER
     # app.logger.debug('---------- Capture gave us an answer ----------')
     # pprint(answer)
     answer = move_captured_to_bucket(answer, path)
     app.logger.debug('---------- Move to Bucket gave us an answer ----------')
     pprint(answer)
-    # TODO: Process the answer to send the needed work to a Task Queue.
-    a = add_to_report(media_type, media_id, payload=answer)
+    # Process the answer to send the needed work to a Task Queue.
+    response = add_to_report(media_type, media_id, answer)
+    if response is None:
+        message = f"Unable to add results to a report queue for media_id: {media_id} "
+        app.logger.debug(message)
+        return message, 500
+    app.logger.debug(f"Created task: {response.name} ")
+    app.logger.debug(response)
     return jsonify(answer)
 
 # end of routes.py file

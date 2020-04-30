@@ -3,10 +3,9 @@ from google.api_core.exceptions import RetryError, AlreadyExists, GoogleAPICallE
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 from datetime import timedelta, datetime as dt
-# from .model_db import Post
 
 PROJECT_ID = app.config.get('PROJECT_ID')
-PROJECT_REGION = app.config.get('PROJECT_REGION')  # Google Docs said PROJECT_ZONE ?
+PROJECT_REGION = app.config.get('PROJECT_REGION')
 REPORT_SERVICE = app.config.get('REPORT_SERVICE')
 REPORT_QUEUE = app.config.get('REPORT_QUEUE')
 client = tasks_v2.CloudTasksClient()
