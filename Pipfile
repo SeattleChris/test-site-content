@@ -16,6 +16,8 @@ pyopenssl = "*"
 gunicorn = "*"
 requests = "*"
 google-cloud-storage = "*"
+google-cloud-tasks = "*"
+googleapis-common-protos = "*"
 
 [requires]
 python_version = "3.7"

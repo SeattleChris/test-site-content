@@ -17,6 +17,8 @@
 | :heavy_check_mark: | Captured images saved to bucket for other app use     |
 | :heavy_check_mark: | Delete excess files after copies saved to Storage.    |
 |                    | API usage is limited to authorized use.               |
+|                    | **Stretch Goal**                                      |
+|                    | API does not require knowing the id of the Post.      |
 |                    | **March 2020 Features Completed**                     |
 |                    | Extra browser navigation for Story Posts is resolved. |
 |                    | Instagram Login as needed for viewing Story Posts.    |
@@ -36,7 +38,7 @@
 - [s] Stretch Goal. Not for current feature plan.
 
 Current Status:
-2020-04-10 19:29:10
+2020-04-29 18:09:24
 <!-- Ctrl-Shift-I to generate timestamp -->
 
 ### Structure & Resources
@@ -49,13 +51,16 @@ Current Status:
 - [x] Create Readme capturing core knowledge documentation.
 - [x] Create checklist connected to the Readme.
 - [x] setup env, gitignore, gcloudignore.
-- [ ] ? Use Tasks or a queue system as entry point trigger to start task?
-  - [ ] Can it connect and digest the Task queue.
-  - [ ] Does it record what Task queues have been processed.
+- [ ] Use Tasks or a queue system as entry point trigger to start task
+  - [n] Can it connect and digest the Task queue (pull task queue)?
+  - [x] Can it schedule API calls, manage failures and retries?
+  - [x] Does it record what Task queues have been processed.
+    - [n] Does the platform application run a function or digest the response json?
+    - [x] Processed tasks are removed from queue if successful, no other response processing
   - [ ] How does the DB update the Post record to associate the media files?
     - [ ] Output another Task queue and have the Platform application process it.
     - [ ] Have this application connect and update the DB directly?
-  - [ ] Take a warmup request or other technique to allow server to go to 0 live versions?
+  - [s] Take a warmup request or other technique to allow server to go to 0 live versions?
 - [n] Use Cloud Functions?
   - [n] Can Chrome run on Cloud Functions.
   - [n] Used as trigger or interface to Engine.
@@ -83,10 +88,12 @@ Current Status:
   - [X] screen works to keep process running after logout.
   - [n] Startup script to start app works on server restart.
 - [x] Setup initial application structure.
-- [ ] Can be called by the platform application.
+- [x] Can be called by the platform application.
   - [x] as an open route for an API call.
-  - [?] with auth on an open route.
-  - [ ] through GCP using a service agent (more secure).
+  - [n] with auth on an open route.
+  - [n] through GCP using a service agent (more secure).
+  - [x] Using gRPC protocol, secured via only managed on Google Cloud Platform
+- [ ] Refactor the API to not require the id of the targeted Post.
 
 ### Application
 
@@ -121,8 +128,9 @@ Current Status:
   - [?] See readme development notes link to `Apps to instances`
   - [?] Also see readme development link to `VPC Firewall`
 - [s] API can accept parameters for url and storage location.
-- [ ] API usage is limited to authorized use.
+- [x] API usage is limited to authorized use.
   - [?] Only works via backend routes?
   - [?] Utilize authorization set up via Google Cloud Platform.
   - [?] Set up authorization API keys
 - [x] Confirm it works for Story Posts and for regular Posts.
+- [ ] After all the capture work, send message to a Task queue for updating the Post in db.

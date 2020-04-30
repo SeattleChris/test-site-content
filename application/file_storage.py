@@ -10,15 +10,18 @@ gcs = storage.Client()
 default_bucket = gcs.get_bucket(app.config.get('CLOUD_STORAGE_BUCKET'))
 
 
-def setup_local_storage(id, media_type, media_id):
+def setup_local_storage(media_type, media_id, id=None):
     """ Create, or use existing, directory for temporarily storing the files on the server. """
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    path = os.path.join(BASE_DIR, 'save', 'posts', str(id))
+    path = os.path.join(BASE_DIR, 'save', 'posts', str(media_id))
+    if id:
+        path = os.path.join(BASE_DIR, 'save', 'posts', str(id))
     name = media_type.lower()
     try:
         os.mkdir(path)
     except FileExistsError as e:
-        name += f"_{str(media_id)}"
+        timestamp = time.strftime('%Y%m%d-%H%M%S')
+        name += f"_{timestamp}"
     except OSError as e:
         raise InvalidUsage("OSError in setup_local_storage. ", status_code=501, payload=e)
     filename = f"{str(path)}/{name}"
@@ -120,7 +123,7 @@ def get_or_create_blob_folder(folder_id, bucket=default_bucket):
     return blob
 
 
-def move_captured_to_bucket(answer, path, folder_id):
+def move_captured_to_bucket(answer, path, folder_id=None):
     """ The answer is a dictionary response from capture.py. The folder_id is an integer directory to store blobs. """
     # answer = {'success': True|False, 'message': 'some text. ', 'file_list': [], 'error_files': []}
     # Below will add answer['url_list'] and answer['deleted] which are both lists.
