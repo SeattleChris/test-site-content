@@ -1,6 +1,7 @@
 from flask import request, render_template, url_for, flash, jsonify, current_app as app
 from .capture import capture
 from .file_storage import setup_local_storage, move_captured_to_bucket, list_buckets, list_blobs
+from .create_queue_task import add_to_report
 from .errors import InvalidUsage
 import simplejson as json
 import requests
@@ -114,6 +115,7 @@ def api(id, media_type, media_id):
     app.logger.debug('---------- Move to Bucket gave us an answer ----------')
     pprint(answer)
     # TODO: Process the answer to send the needed work to a Task Queue.
+    a = add_to_report(media_type, media_id, payload=answer)
     return jsonify(answer)
 
 # end of routes.py file
