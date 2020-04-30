@@ -81,21 +81,39 @@ def call(media_type):
     return render_template('base.html', text=res.json().get('message', 'NO MESSAGE'), results=res.json(), links='dict')
 
 
-@app.route('/api/v1/post/<int:id>/<string:media_type>/<int:media_id>/')
-def api(id, media_type, media_id):
+@app.route('/api/v0/post/<int:id>/<string:media_type>/<int:media_id>/')
+def api_0(id, media_type, media_id):
     """ Save content and associate with Post, which may be a story or regular Post. """
     # Passed as query string, we find it in request.args. Passed as form, we find in request.form.to_dict(flat=True)
     ig_url = request.args.get('url')
     app.logger.debug('========== the API was called! ==========')
-    path, filename = setup_local_storage(id, media_type, media_id)
+    path, filename = setup_local_storage(media_type, media_id, id=id)
     answer = capture(ig_url, filename, media_type=media_type.upper())
     # answer = TEST_ANSWER
     # app.logger.debug('---------- Capture gave us an answer ----------')
     # pprint(answer)
-    answer = move_captured_to_bucket(answer, path, id)
+    answer = move_captured_to_bucket(answer, path, id=id)
     app.logger.debug('---------- Move to Bucket gave us an answer ----------')
     pprint(answer)
     return jsonify(answer)
 
+
+@app.route('/api/v1/post/<string:media_type>/<int:media_id>/')
+def api(id, media_type, media_id):
+    """ Save content and associate with Post, which may be a story or regular Post. """
+    # Passed as query string, we find it in request.args. Passed as form, we find in request.form.to_dict(flat=True)
+    # Passed as POST we find the payload in the body.
+    ig_url = request.args.get('url')
+    app.logger.debug('========== the API was called! ==========')
+    path, filename = setup_local_storage(media_type, media_id)
+    answer = capture(ig_url, filename, media_type=media_type.upper())
+    # answer = TEST_ANSWER
+    # app.logger.debug('---------- Capture gave us an answer ----------')
+    # pprint(answer)
+    answer = move_captured_to_bucket(answer, path)
+    app.logger.debug('---------- Move to Bucket gave us an answer ----------')
+    pprint(answer)
+    # TODO: Process the answer to send the needed work to a Task Queue.
+    return jsonify(answer)
 
 # end of routes.py file
