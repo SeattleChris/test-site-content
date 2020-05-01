@@ -108,16 +108,16 @@ def api(mod):
     # The query string is in request.args, a form is in request.form.to_dict(flat=True), body is request.to_json()
     app.logger.debug('========== the API v1 was called! ==========')
     args = request.args
-    req_body = request.to_json()
+    req_body = request.json if request.is_json else request.data
     head = {}
-    head['x_queue_name'] = request.header.get('X-AppEngine-QueueName', None)
-    head['x_task_id'] = request.header.get('X-CloudTasks-TaskName', None)
-    head['x_retry_count'] = request.header.get('X-CloudTasks-TaskRetryCount', None)
-    head['x_response_count'] = request.header.get('X-AppEngine-TaskExecutionCount', None)
-    head['x_task_eta'] = request.header.get('X-AppEngine-TaskETA', None)
-    head['x_task_previous_response'] = request.header.get('X-AppEngine-TaskPreviousResponse', None)
-    head['x_task_retry_reason'] = request.header.get('X-AppEngine-TaskRetryReason', None)
-    head['x_fail_fast'] = request.header.get('X-AppEngine-FailFast', None)
+    head['x_queue_name'] = request.headers.get('X-AppEngine-QueueName', None)
+    head['x_task_id'] = request.headers.get('X-CloudTasks-TaskName', None)
+    head['x_retry_count'] = request.headers.get('X-CloudTasks-TaskRetryCount', None)
+    head['x_response_count'] = request.headers.get('X-AppEngine-TaskExecutionCount', None)
+    head['x_task_eta'] = request.headers.get('X-AppEngine-TaskETA', None)
+    head['x_task_previous_response'] = request.headers.get('X-AppEngine-TaskPreviousResponse', None)
+    head['x_task_retry_reason'] = request.headers.get('X-AppEngine-TaskRetryReason', None)
+    head['x_fail_fast'] = request.headers.get('X-AppEngine-FailFast', None)
     pprint(args)
     pprint(req_body)
     app.logger.debug('-----------------------------------------')
@@ -129,6 +129,8 @@ def api(mod):
     dataset = req_body.get('dataset', [])
     source = req_body.get('source', {})
     source.update(head)
+    pprint(source)
+    app.logger.debug('-----------------------------------------')
     results, had_error = [], False
     for data in dataset:
         media_type = data.get('media_type', '')

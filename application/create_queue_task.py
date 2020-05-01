@@ -3,6 +3,7 @@ from google.api_core.exceptions import RetryError, AlreadyExists, GoogleAPICallE
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 from datetime import timedelta, datetime as dt
+import json
 
 PROJECT_ID = app.config.get('PROJECT_ID')
 PROJECT_REGION = app.config.get('PROJECT_REGION')
@@ -28,9 +29,11 @@ def _get_report_queue(queue_name, report_settings):
     queue_settings = {'name': queue_path, 'rate_limits': rate_limits, 'retry_config': retry_config}
     if report_settings.get('service'):
         queue_settings['app_engine_routing_override'] = {'service': report_settings['service']}
+    elif REPORT_SERVICE:
+        queue_settings['app_engine_routing_override'] = {'service': REPORT_SERVICE}
     for queue in client.list_queues(parent):  # TODO: Improve efficiency since queues list is in lexicographical order
         if queue_settings['name'] == queue.name:
-            # TODO: Fix q = client.update_queue(queue_settings, retry=capture_retry)
+            # TODO: Fix q = client.update_queue(queue_settings)
             return queue.name
     try:
         q = client.create_queue(parent, queue_settings)
@@ -64,7 +67,7 @@ def add_to_report(payload, report_settings, queue_name='testing', task_name=None
             'app_engine_http_request': {  # Specify the type of request.
                 'http_method': 'POST',
                 'relative_uri': report_settings('relative_uri', ''),
-                'body': payload.encode()  # Task API requires type bytes.
+                'body': json.dumps(payload).encode()  # Task API requires type bytes.
             }
     }
     if task_name:
