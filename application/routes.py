@@ -21,7 +21,7 @@ TEST_ANSWER = {'success': True,
 @app.route('/')
 def home():
     test = {'success': True, 'route': 'home'}
-    app.logger.debug(json.dumps(test))
+    app.logger.info(json.dumps(test))
     app.logger.debug(request)
     message = 'This is the Home Page!'
     flash("Loaded Home Page. ")
@@ -106,25 +106,24 @@ def api(mod):
     if mod != 'post':
         return "Unknown Data Type in Request", 404
     # The query string is in request.args, a form is in request.form.to_dict(flat=True), body is request.to_json()
-    app.logger.debug('========== the API v1 was called! ==========')
-    app.logger.debug(type(request.headers))
-    pprint(request.headers)
-    app.logger.debug('-----------------------------------------')
+    app.logger.info('========== the API v1 was called! ==========')
+    # app.logger.debug(type(request.headers))
+    # pprint(request.headers)
+    # app.logger.debug('-----------------------------------------')
     args = request.args
     req_body = request.json if request.is_json else request.data
     req_body = json.loads(req_body.decode())
     head = {}
     head['x_queue_name'] = request.headers.get('X-AppEngine-QueueName', None)
-    head['x_task_id'] = request.headers.get('X-CloudTasks-TaskName', None)
-    head['x_retry_count'] = request.headers.get('X-CloudTasks-TaskRetryCount', None)
+    head['x_task_id'] = request.headers.get('X-Appengine-Taskname', None)
+    head['x_retry_count'] = request.headers.get('X-Appengine-Taskretrycount', None)
     head['x_response_count'] = request.headers.get('X-AppEngine-TaskExecutionCount', None)
     head['x_task_eta'] = request.headers.get('X-AppEngine-TaskETA', None)
     head['x_task_previous_response'] = request.headers.get('X-AppEngine-TaskPreviousResponse', None)
     head['x_task_retry_reason'] = request.headers.get('X-AppEngine-TaskRetryReason', None)
     head['x_fail_fast'] = request.headers.get('X-AppEngine-FailFast', None)
     pprint(args)
-    pprint(req_body)
-    app.logger.debug('-----------------------------------------')
+    # pprint(req_body)
     # report_settings = {'service': environ.get('GAE_SERVICE', 'dev'), 'relative_uri': '/capture/report/'}
     # source = {'queue_type': queue_name, 'queue_name': parent, 'object_type': mod}
     # data = {'target_url': post.permalink, 'media_type': post.media_type, 'media_id': post.media_id}
@@ -133,8 +132,13 @@ def api(mod):
     dataset = req_body.get('dataset', [])
     source = req_body.get('source', {})
     source.update(head)
+    app.logger.info('-------------- report settings ---------------------------')
+    pprint(report_settings)
+    app.logger.info('---------------  dataset  --------------------------')
+    pprint(dataset)
+    app.logger.info('---------------   source   --------------------------')
     pprint(source)
-    app.logger.debug('-----------------------------------------')
+    app.logger.info('-----------------------------------------')
     results, had_error = [], False
     for data in dataset:
         media_type = data.get('media_type', '')
@@ -145,11 +149,11 @@ def api(mod):
         if response is None:
             had_error = True
             message = f"Unable to add results to a report queue for {mod} data with media_id {media_id} "
-            app.logger.debug(message)
+            app.logger.info(message)
             pprint(payload)
             response = {'error': message, 'status_code': 500}
         else:
-            app.logger.debug(f"Created task: {response.name} ")
+            app.logger.info(f"Created task: {response.name} ")
             pprint(response)
         results.append(response)
     status_code = 500 if had_error else 201
@@ -161,7 +165,7 @@ def process_one(mod, media_type, media_id, ig_url):
     path, filename = setup_local_storage(mod, media_type, media_id)
     answer = capture(ig_url, filename, media_type=media_type.upper())
     answer = move_captured_to_bucket(answer, path)
-    app.logger.debug('---------- Answer after Setup, Capture, AND Move to Bucket ----------')
+    app.logger.info('---------- Answer after Setup, Capture, AND Move to Bucket ----------')
     pprint(answer)
     return prepare_payload_from_answer(media_type, media_id, answer)
 
@@ -173,8 +177,8 @@ def prepare_payload_from_answer(media_type, media_id, answer):
     else:
         # TODO: determine which files have issues & handle them.
         pass
-    if len(answer['error']) == 0:
-        del answer['error']
+    if len(answer['error_files']) == 0:
+        del answer['error_files']
     else:
         # TODO: determine which files have issues & handle them.
         pass
@@ -190,7 +194,7 @@ def prepare_payload_from_answer(media_type, media_id, answer):
     payload['changes'] = [change_vals]
     if answer:
         payload['error'] = answer
-    app.logger.debug('============== Payload built from Answer =================')
+    app.logger.info('============== Payload built from Answer =================')
     pprint(payload)
     return payload
 
