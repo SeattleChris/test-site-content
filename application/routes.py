@@ -109,6 +109,15 @@ def api(mod):
     app.logger.debug('========== the API v1 was called! ==========')
     args = request.args
     req_body = request.to_json()
+    head = {}
+    head['x_queue_name'] = request.header.get('X-AppEngine-QueueName', None)
+    head['x_task_id'] = request.header.get('X-CloudTasks-TaskName', None)
+    head['x_retry_count'] = request.header.get('X-CloudTasks-TaskRetryCount', None)
+    head['x_response_count'] = request.header.get('X-AppEngine-TaskExecutionCount', None)
+    head['x_task_eta'] = request.header.get('X-AppEngine-TaskETA', None)
+    head['x_task_previous_response'] = request.header.get('X-AppEngine-TaskPreviousResponse', None)
+    head['x_task_retry_reason'] = request.header.get('X-AppEngine-TaskRetryReason', None)
+    head['x_fail_fast'] = request.header.get('X-AppEngine-FailFast', None)
     pprint(args)
     pprint(req_body)
     app.logger.debug('-----------------------------------------')
@@ -117,8 +126,9 @@ def api(mod):
     # data = {'target_url': post.permalink, 'media_type': post.media_type, 'media_id': post.media_id}
     # req_body = {'report_settings': report_back, 'source': source, 'dataset': [data]}
     report_settings = req_body.get('report_settings', {})
-    source = req_body.get('source', {})
     dataset = req_body.get('dataset', [])
+    source = req_body.get('source', {})
+    source.update(head)
     results, had_error = [], False
     for data in dataset:
         media_type = data.get('media_type', '')
