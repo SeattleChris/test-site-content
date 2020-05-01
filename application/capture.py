@@ -172,8 +172,8 @@ def chrome_grab(ig_url, filename, media_type, headless=True):
     """ Using selenium webdriver with Chrome and grabing the file from the page content. """
     # headless = False  # TODO: Usually set as True. Only set to False to visually watch when running locally.
     app.logger.info(f"================= chrome_grab with headless as {headless} ================")
-    driver = setup_chromedriver(headless=headless)
     success, answer = True, {}
+    driver = setup_chromedriver(headless=headless)
     driver.get(ig_url)
     if media_type == 'STORY':
         driver, success = ig_login(driver, current_page=True)

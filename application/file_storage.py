@@ -10,12 +10,14 @@ gcs = storage.Client()
 default_bucket = gcs.get_bucket(app.config.get('CLOUD_STORAGE_BUCKET'))
 
 
-def setup_local_storage(media_type, media_id, id=None):
+def setup_local_storage(mod, media_type, media_id, id=None):
     """ Create, or use existing, directory for temporarily storing the files on the server. """
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    path = os.path.join(BASE_DIR, 'save', 'posts', str(media_id))
+    if mod == 'post':
+        mod = 'posts'
+    path = os.path.join(BASE_DIR, 'save', mod, str(media_id))
     if id:
-        path = os.path.join(BASE_DIR, 'save', 'posts', str(id))
+        path = os.path.join(BASE_DIR, 'save', mod, str(id))
     name = media_type.lower()
     try:
         os.mkdir(path)
