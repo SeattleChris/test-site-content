@@ -107,8 +107,12 @@ def api(mod):
         return "Unknown Data Type in Request", 404
     # The query string is in request.args, a form is in request.form.to_dict(flat=True), body is request.to_json()
     app.logger.debug('========== the API v1 was called! ==========')
+    app.logger.debug(type(request.headers))
+    pprint(request.headers)
+    app.logger.debug('-----------------------------------------')
     args = request.args
     req_body = request.json if request.is_json else request.data
+    req_body = json.loads(req_body.decode())
     head = {}
     head['x_queue_name'] = request.headers.get('X-AppEngine-QueueName', None)
     head['x_task_id'] = request.headers.get('X-CloudTasks-TaskName', None)
