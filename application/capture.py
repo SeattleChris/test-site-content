@@ -71,12 +71,12 @@ def ig_login(driver, current_page=True, ig_email=IG_EMAIL, ig_password=IG_PASSWO
         except NoSuchElementException as e:
             app.logger.error(f"Exception for target_button: {attempts} left. ")
             if not attempts:
-                app.logger.exception(e)
+                app.logger.error(e)
             else:
                 wait('quick')
         except Exception as e:
             app.logger.error("Exception in ig_login. ")
-            app.logger.exception(e)
+            app.logger.error(e)
             driver.quit()
             raise e
     if form_inputs:
@@ -112,12 +112,12 @@ def story_click(driver):
         except NoSuchElementException as e:
             app.logger.info(f"Exception for target_button: {attempts} left. ")
             if not attempts:
-                app.logger.exception(e)
+                app.logger.error(e)
             else:
                 wait('quick')
         except Exception as e:
             app.logger.error("Exception in story_click. ")
-            app.logger.exception(e)
+            app.logger.error(e)
             driver.quit()
             raise e
     if success:
@@ -160,7 +160,7 @@ def capture_img(filename, driver, media_type=''):
             message += f"Error on file # {count} . "
             error_count += 1
             error_files.append(temp)
-            app.logger.exception(e)
+            app.logger.error(e)
     success = error_count == 0
     message += 'Files Saved! ' if success else "Error in Screen Grab. "
     app.logger.info(message)
@@ -171,9 +171,11 @@ def capture_img(filename, driver, media_type=''):
 def chrome_grab(ig_url, filename, media_type, headless=True):
     """ Using selenium webdriver with Chrome and grabing the file from the page content. """
     # headless = False  # TODO: Usually set as True. Only set to False to visually watch when running locally.
-    # app.logger.info(f"================= chrome_grab with headless as {headless} ================")
+    app.logger.info(f"================= chrome_grab with headless as {headless} ================")
     success, answer = True, {}
     driver = setup_chromedriver(headless=headless)
+    app.logger.info('-------------------- chrome_grab -----------------')
+    pprint(driver)
     driver.get(ig_url)
     if media_type == 'STORY':
         driver, success = ig_login(driver, current_page=True)
@@ -184,7 +186,7 @@ def chrome_grab(ig_url, filename, media_type, headless=True):
     if media_type == 'STORY' and success:
         success = False
         driver, success = story_click(driver)
-        # app.logger.info(f"========== story_click response: {success} ==========")
+        app.logger.info(f"========== story_click response: {success} ==========")
     if success:
         answer = capture_img(filename, driver)
         # app.logger.info("------ capture_img gave a response ------")

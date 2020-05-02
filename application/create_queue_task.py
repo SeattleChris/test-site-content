@@ -55,7 +55,7 @@ def _get_report_queue(queue_name, report_settings):
         app.logger.info(f"Google API Call Error on get/create/update {queue_name} ")
         app.logger.error(error)
         q = None
-    return queue_path if q else None
+    return q
 
 
 def add_to_report(payload, report_settings, queue_name='testing', task_name=None, in_seconds=90):

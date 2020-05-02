@@ -145,17 +145,17 @@ def api(mod):
         media_id = data.get('media_id')
         payload = process_one(mod, media_type, media_id, data.get('target_url', ''))
         payload['source'] = source
-        response = add_to_report(payload, report_settings)
-        if response is None:
+        task = add_to_report(payload, report_settings)
+        if task is None:
             had_error = True
             message = f"Unable to add results to a report queue for {mod} data with media_id {media_id} "
             app.logger.info(message)
             pprint(payload)
-            response = {'error': message, 'status_code': 500}
+            task = {'error': message, 'status_code': 500}
         else:
-            app.logger.info(f"Created task: {response.name} ")
-            pprint(response)
-        results.append(response)
+            app.logger.info(f"Created task: {task.name} ")
+            pprint(task)
+        results.append(task)
     status_code = 500 if had_error else 201
     return results, status_code
 
