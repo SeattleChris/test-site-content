@@ -67,9 +67,9 @@ def ig_login(driver, current_page=True, ig_email=IG_EMAIL, ig_password=IG_PASSWO
             if not form_inputs:
                 raise NoSuchElementException('Not yet. ')
             app.logger.info(f"Form inputs found! On Attempt: {5 - attempts} ")
-            pprint(form_inputs)
+            app.logger.info(f"Have {len(form_inputs)} form inputs for ig_login. ")
         except NoSuchElementException as e:
-            app.logger.error(f"Exception for target_button: {attempts} left. ")
+            app.logger.info(f"Exception for target_button: {attempts} left. ")
             if not attempts:
                 app.logger.error(e)
             else:
@@ -80,7 +80,6 @@ def ig_login(driver, current_page=True, ig_email=IG_EMAIL, ig_password=IG_PASSWO
             driver.quit()
             raise e
     if form_inputs:
-        # app.logger.info(f"We have {len(form_inputs)} input fields. ")
         email_input = form_inputs[0]
         password_input = form_inputs[1]
         email_input.send_keys(ig_email)
@@ -193,6 +192,7 @@ def chrome_grab(ig_url, filename, media_type, headless=True):
     else:
         message = f"The story_click function had an issue. "
         answer = {'success': success, 'message': message, 'file_list': [], 'error_files': []}
+    app.logger.info("Finishing chrome grab. ")
     pprint(answer)
     driver.quit()  # driver.close() to close tab? driver.exit() to end browser?
     return answer

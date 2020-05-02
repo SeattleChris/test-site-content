@@ -71,7 +71,7 @@ def add_to_report(payload, report_settings, queue_name='testing', task_name=None
     task = {
             'app_engine_http_request': {  # Specify the type of request.
                 'http_method': 'POST',
-                'relative_uri': report_settings('relative_uri', ''),
+                'relative_uri': report_settings.get('relative_uri', ''),
                 'body': json.dumps(payload).encode()  # Task API requires type bytes.
             }
     }
