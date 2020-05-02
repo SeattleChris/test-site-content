@@ -107,7 +107,6 @@ def api(mod):
         return "Unknown Data Type in Request", 404
     # The query string is in request.args, a form is in request.form.to_dict(flat=True), body is request.to_json()
     app.logger.info('========== the API v1 was called! ==========')
-    pprint(request.headers)
     args = request.args
     if args:
         app.logger.info(args)

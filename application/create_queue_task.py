@@ -1,7 +1,7 @@
 from flask import current_app as app
 from google.api_core.exceptions import RetryError, AlreadyExists, GoogleAPICallError
 from google.cloud import tasks_v2
-from google.protobuf import timestamp_pb2
+from google.protobuf import timestamp_pb2, duration_pb2
 from datetime import timedelta, datetime as dt
 import json
 
@@ -16,16 +16,21 @@ def _get_report_queue(queue_name, report_settings):
     """ Creates or gets a queue to process the outcome of capture queues processed by this application.
         May need to refactor to Create or Update a queue.
     """
-    # report_settings = {'service': environ.get('GAE_SERVICE', 'dev'), 'relative_uri': '/capture/report/'}
+    # report_settings = {'service': <service-expecting-report>, 'relative_uri': '/capture/report/', <other-overrides>}
     queue_name = report_settings.get('queue_name', queue_name or 'test')
     queue_name = f"{REPORT_QUEUE}-{queue_name}".lower()
     parent = client.location_path(PROJECT_ID, PROJECT_REGION)  # f"projects/{PROJECT_ID}/locations/{PROJECT_REGION}"
     queue_path = client.queue_path(PROJECT_ID, PROJECT_REGION, queue_name)
     rate_limits = {'max_concurrent_dispatches': 1, 'max_dispatches_per_second': 1}
-    rate_limits.update(report_settings.get('rate_limits'))
-    retry_config = {'max_attempts': 30, 'min_backoff': '1', 'max_backoff': '3600', 'max_doublings': 10}
-    retry_config['max_retry_duration'] = '48h'
-    retry_config.update(report_settings.get('retry_config'))
+    rate_limits.update(report_settings.get('rate_limits', {}))
+    retry_config = {'max_attempts': 30, 'min_backoff': '2s', 'max_backoff': '3600s', 'max_doublings': 10}
+    retry_config['max_retry_duration'] = '172800s'
+    retry_config.update(report_settings.get('retry_config', {}))
+    min_backoff, max_backoff, max_life = duration_pb2.Duration(), duration_pb2.Duration(), duration_pb2.Duration()
+    min_backoff.FromJsonString(retry_config['min_backoff'])      # Default: 2 seconds
+    max_backoff.FromJsonString(retry_config['max_backoff'])      # Default: 1 hour
+    max_life.FromJsonString(retry_config['max_retry_duration'])  # Default: 2 days
+    retry_config.update({'min_backoff': min_backoff, 'max_backoff': max_backoff, 'max_retry_duration': max_life})
     queue_settings = {'name': queue_path, 'rate_limits': rate_limits, 'retry_config': retry_config}
     if report_settings.get('service'):
         queue_settings['app_engine_routing_override'] = {'service': report_settings['service']}
