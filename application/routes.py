@@ -107,12 +107,10 @@ def api(mod):
         return "Unknown Data Type in Request", 404
     # The query string is in request.args, a form is in request.form.to_dict(flat=True), body is request.to_json()
     app.logger.info('========== the API v1 was called! ==========')
-    # app.logger.debug(type(request.headers))
-    # pprint(request.headers)
-    # app.logger.debug('-----------------------------------------')
+    pprint(request.headers)
     args = request.args
-    req_body = request.json if request.is_json else request.data
-    req_body = json.loads(req_body.decode())
+    if args:
+        app.logger.info(args)
     head = {}
     head['x_queue_name'] = request.headers.get('X-AppEngine-QueueName', None)
     head['x_task_id'] = request.headers.get('X-Appengine-Taskname', None)
@@ -122,20 +120,23 @@ def api(mod):
     head['x_task_previous_response'] = request.headers.get('X-AppEngine-TaskPreviousResponse', None)
     head['x_task_retry_reason'] = request.headers.get('X-AppEngine-TaskRetryReason', None)
     head['x_fail_fast'] = request.headers.get('X-AppEngine-FailFast', None)
-    pprint(args)
-    # pprint(req_body)
-    # report_settings = {'service': environ.get('GAE_SERVICE', 'dev'), 'relative_uri': '/capture/report/'}
+    if not head:
+        app.logger.error("This request is not coming from our project. It should be rejected. ")
+        # TODO: Reject requests from other sources.
+    req_body = request.json if request.is_json else request.data
+    req_body = json.loads(req_body.decode())  # The request body from a Task API is byte encoded
+    # req_body = {'report_settings': report_settings, 'source': source, 'dataset': [data]}
+    # report_settings = {'service': <for-routing-override>, 'relative_uri': <route-to-send-report>}
     # source = {'queue_type': queue_name, 'queue_name': parent, 'object_type': mod}
     # data = {'target_url': post.permalink, 'media_type': post.media_type, 'media_id': post.media_id}
-    # req_body = {'report_settings': report_back, 'source': source, 'dataset': [data]}
     report_settings = req_body.get('report_settings', {})
     dataset = req_body.get('dataset', [])
     source = req_body.get('source', {})
     source.update(head)
-    app.logger.info('-------------- report settings ---------------------------')
-    pprint(report_settings)
-    app.logger.info('---------------  dataset  --------------------------')
-    pprint(dataset)
+    # app.logger.info('-------------- report settings ---------------------------')
+    # pprint(report_settings)
+    # app.logger.info('---------------  dataset  --------------------------')
+    # pprint(dataset)
     app.logger.info('---------------   source   --------------------------')
     pprint(source)
     app.logger.info('-----------------------------------------')
@@ -157,7 +158,7 @@ def api(mod):
             pprint(response)
         results.append(response)
     status_code = 500 if had_error else 201
-    return jsonify(results), status_code
+    return results, status_code
 
 
 def process_one(mod, media_type, media_id, ig_url):
@@ -165,8 +166,8 @@ def process_one(mod, media_type, media_id, ig_url):
     path, filename = setup_local_storage(mod, media_type, media_id)
     answer = capture(ig_url, filename, media_type=media_type.upper())
     answer = move_captured_to_bucket(answer, path)
-    app.logger.info('---------- Answer after Setup, Capture, AND Move to Bucket ----------')
-    pprint(answer)
+    # app.logger.info('---------- Answer after Setup, Capture, AND Move to Bucket ----------')
+    # pprint(answer)
     return prepare_payload_from_answer(media_type, media_id, answer)
 
 
@@ -194,8 +195,8 @@ def prepare_payload_from_answer(media_type, media_id, answer):
     payload['changes'] = [change_vals]
     if answer:
         payload['error'] = answer
-    app.logger.info('============== Payload built from Answer =================')
-    pprint(payload)
+    # app.logger.info('============== Payload built from Answer =================')
+    # pprint(payload)
     return payload
 
 # end of routes.py file
