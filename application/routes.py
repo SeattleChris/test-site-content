@@ -21,7 +21,7 @@ TEST_ANSWER = {'success': True,
 @app.route('/')
 def home():
     test = {'success': True, 'route': 'home'}
-    app.logger.debug(json.dumps(test))
+    app.logger.info(json.dumps(test))
     app.logger.debug(request)
     message = 'This is the Home Page!'
     flash("Loaded Home Page. ")
@@ -82,13 +82,14 @@ def call(media_type):
     return render_template('base.html', text=res.json().get('message', 'NO MESSAGE'), results=res.json(), links='dict')
 
 
-@app.route('/api/v0/post/<int:id>/<string:media_type>/<int:media_id>/')
+@app.route('/api/v1/post/<int:id>/<string:media_type>/<int:media_id>/')
 def api_0(id, media_type, media_id):
     """ Save content and associate with Post, which may be a story or regular Post. """
+    mod = 'post'
     # Passed as query string, we find it in request.args. Passed as form, we find in request.form.to_dict(flat=True)
     ig_url = request.args.get('url')
-    app.logger.debug('========== the API was called! ==========')
-    path, filename = setup_local_storage(media_type, media_id, id=id)
+    app.logger.debug('========== the API ver. 0 was called! ==========')
+    path, filename = setup_local_storage(mod, media_type, media_id, id=id)
     answer = capture(ig_url, filename, media_type=media_type.upper())
     # answer = TEST_ANSWER
     # app.logger.debug('---------- Capture gave us an answer ----------')
@@ -99,28 +100,102 @@ def api_0(id, media_type, media_id):
     return jsonify(answer)
 
 
-@app.route('/api/v1/post/<string:media_type>/<int:media_id>/')
-def api(media_type, media_id):
+@app.route('/api/v1/<string:mod>/', methods=['GET', 'POST'])
+def api(mod):
     """ Save content and associate with Post, which may be a story or regular Post. """
-    # Passed as query string, we find it in request.args. Passed as form, we find in request.form.to_dict(flat=True)
-    # Passed as POST we find the payload in the body.
-    ig_url = request.args.get('url')
-    app.logger.debug('========== the API was called! ==========')
-    path, filename = setup_local_storage(media_type, media_id)
+    if mod != 'post':
+        return "Unknown Data Type in Request", 404
+    # The query string is in request.args, a form is in request.form.to_dict(flat=True), body is request.to_json()
+    app.logger.info('========== the API v1 was called! ==========')
+    args = request.args
+    if args:
+        app.logger.info(args)
+    head = {}
+    head['x_queue_name'] = request.headers.get('X-AppEngine-QueueName', None)
+    head['x_task_id'] = request.headers.get('X-Appengine-Taskname', None)
+    head['x_retry_count'] = request.headers.get('X-Appengine-Taskretrycount', None)
+    head['x_response_count'] = request.headers.get('X-AppEngine-TaskExecutionCount', None)
+    head['x_task_eta'] = request.headers.get('X-AppEngine-TaskETA', None)
+    head['x_task_previous_response'] = request.headers.get('X-AppEngine-TaskPreviousResponse', None)
+    head['x_task_retry_reason'] = request.headers.get('X-AppEngine-TaskRetryReason', None)
+    head['x_fail_fast'] = request.headers.get('X-AppEngine-FailFast', None)
+    if not head:
+        app.logger.error("This request is not coming from our project. It should be rejected. ")
+        # TODO: Reject requests from other sources.
+    req_body = request.json if request.is_json else request.data
+    req_body = json.loads(req_body.decode())  # The request body from a Task API is byte encoded
+    # req_body = {'report_settings': report_settings, 'source': source, 'dataset': [data]}
+    # report_settings = {'service': <for-routing-override>, 'relative_uri': <route-to-send-report>}
+    # source = {'queue_type': queue_name, 'queue_name': parent, 'object_type': mod}
+    # data = {'target_url': post.permalink, 'media_type': post.media_type, 'media_id': post.media_id}
+    report_settings = req_body.get('report_settings', {})
+    dataset = req_body.get('dataset', [])
+    source = req_body.get('source', {})
+    source.update(head)
+    # app.logger.info('-------------- report settings ---------------------------')
+    # pprint(report_settings)
+    # app.logger.info('---------------  dataset  --------------------------')
+    # pprint(dataset)
+    app.logger.info('---------------   source   --------------------------')
+    pprint(source)
+    app.logger.info('-----------------------------------------')
+    results, had_error = [], False
+    for data in dataset:
+        media_type = data.get('media_type', '')
+        media_id = data.get('media_id')
+        payload = process_one(mod, media_type, media_id, data.get('target_url', ''))
+        payload['source'] = source
+        task = add_to_report(payload, report_settings)
+        if task is None:
+            had_error = True
+            message = f"Unable to add results to a report queue for {mod} data with media_id {media_id} "
+            app.logger.info(message)
+            pprint(payload)
+            task = {'error': message, 'status_code': 500}
+        else:
+            app.logger.info(f"Created task: {task.name} ")
+            pprint(task)
+        results.append(task)
+    status_code = 500 if had_error else 201
+    return results, status_code
+
+
+def process_one(mod, media_type, media_id, ig_url):
+    """ Executes all the steps to process a request for one capture page. """
+    path, filename = setup_local_storage(mod, media_type, media_id)
     answer = capture(ig_url, filename, media_type=media_type.upper())
-    # app.logger.debug('---------- Capture gave us an answer ----------')
-    # pprint(answer)
     answer = move_captured_to_bucket(answer, path)
-    app.logger.debug('---------- Move to Bucket gave us an answer ----------')
-    pprint(answer)
-    # Process the answer to send the needed work to a Task Queue.
-    response = add_to_report(media_type, media_id, answer)
-    if response is None:
-        message = f"Unable to add results to a report queue for media_id: {media_id} "
-        app.logger.debug(message)
-        return message, 500
-    app.logger.debug(f"Created task: {response.name} ")
-    app.logger.debug(response)
-    return jsonify(answer)
+    # app.logger.info('---------- Answer after Setup, Capture, AND Move to Bucket ----------')
+    # pprint(answer)
+    return prepare_payload_from_answer(media_type, media_id, answer)
+
+
+def prepare_payload_from_answer(media_type, media_id, answer):
+    """ Used to manage odd outcomes during our setup_local_storage, capture, and move_capture_to_bucket stages """
+    if len(answer['deleted']) == len(answer['file_list']) + 1:
+        del answer['deleted']
+    else:
+        # TODO: determine which files have issues & handle them.
+        pass
+    if len(answer['error_files']) == 0:
+        del answer['error_files']
+    else:
+        # TODO: determine which files have issues & handle them.
+        pass
+    if len(answer['file_list']) == len(answer['url_list']):
+        del answer['file_list']
+    else:
+        # TODO: determine which files have issues & handle them.
+        pass
+    # If all went well: answer now has key for 'success', 'message', and 'url_list'
+    payload = {'success': answer.pop('success', False), 'message': answer.pop('message', '')}
+    change_vals = {'media_type': media_type.lower(), 'media_id': str(media_id)}
+    change_vals['saved_media'] = answer.pop('url_list', [])
+    payload['changes'] = [change_vals]
+    if answer:
+        payload['error'] = answer
+    # app.logger.info('============== Payload built from Answer =================')
+    # pprint(payload)
+    return payload
 
 # end of routes.py file

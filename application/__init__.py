@@ -18,14 +18,4 @@ def create_app(config, testing=False, config_overrides=None):
         from . import routes  # noqa: F401
         from . import errors  # noqa: F401
 
-    # TODO: For production, the output of the error should be disabled.
-    @app.errorhandler(500)
-    def server_error(e):
-        app.logger.error('================== Error Handler =====================')
-        app.logger.error(e)
-        return """
-        An internal error occurred: <pre>{}</pre>
-        See logs for full stacktrace.
-        """.format(e), 500
-
     return app

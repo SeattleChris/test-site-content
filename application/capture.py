@@ -49,7 +49,7 @@ def setup_chromedriver(headless=True):
         # chrome_executable_path = '/usr/bin/google-chrome'
     chromedriver_path = 'chromedriver' if app.config.get('LOCAL_ENV') else '/usr/bin/chromedriver'
     driver = webdriver.Chrome(chromedriver_path, options=options)
-    app.logger.info("=========================== Setup chrome driver ===========================")
+    # app.logger.info("=========================== Setup chrome driver ===========================")
     return driver
 
 
@@ -58,7 +58,7 @@ def ig_login(driver, current_page=True, ig_email=IG_EMAIL, ig_password=IG_PASSWO
     if not current_page:
         driver.get('https://www.instagram.com/accounts/login/')
     wait('quick')  # Let the page finish loading.
-    app.logger.info('============== InstaGram Login ===================')
+    # app.logger.info('============== InstaGram Login ===================')
     attempts, form_inputs = 5, []
     while attempts and not form_inputs:
         attempts -= 1
@@ -67,20 +67,19 @@ def ig_login(driver, current_page=True, ig_email=IG_EMAIL, ig_password=IG_PASSWO
             if not form_inputs:
                 raise NoSuchElementException('Not yet. ')
             app.logger.info(f"Form inputs found! On Attempt: {5 - attempts} ")
-            pprint(form_inputs)
+            app.logger.info(f"Have {len(form_inputs)} form inputs for ig_login. ")
         except NoSuchElementException as e:
-            app.logger.error(f"Exception for target_button: {attempts} left. ")
+            app.logger.info(f"Exception for target_button: {attempts} left. ")
             if not attempts:
-                app.logger.exception(e)
+                app.logger.error(e)
             else:
                 wait('quick')
         except Exception as e:
             app.logger.error("Exception in ig_login. ")
-            app.logger.exception(e)
+            app.logger.error(e)
             driver.quit()
             raise e
     if form_inputs:
-        app.logger.info(f"We have {len(form_inputs)} input fields. ")
         email_input = form_inputs[0]
         password_input = form_inputs[1]
         email_input.send_keys(ig_email)
@@ -92,7 +91,7 @@ def ig_login(driver, current_page=True, ig_email=IG_EMAIL, ig_password=IG_PASSWO
 
 def story_click(driver):
     """ Do the necessary browser actions for a story post. """
-    app.logger.info('============== story_click ================')
+    # app.logger.info('============== story_click ================')
     # all_buttons = driver.find_elements_by_tag_name('button')
     # desired_div_inside_button = driver.find_element_by_xpath("//button/descendant::div[text()='Tap to play']")
     # desired_div_inside_button = driver.find_element_by_xpath("//button/descendant::div[contains(., 'Tap to play')]")
@@ -112,12 +111,12 @@ def story_click(driver):
         except NoSuchElementException as e:
             app.logger.info(f"Exception for target_button: {attempts} left. ")
             if not attempts:
-                app.logger.exception(e)
+                app.logger.error(e)
             else:
                 wait('quick')
         except Exception as e:
             app.logger.error("Exception in story_click. ")
-            app.logger.exception(e)
+            app.logger.error(e)
             driver.quit()
             raise e
     if success:
@@ -128,7 +127,7 @@ def story_click(driver):
 
 def capture_img(filename, driver, media_type=''):
     """ For a given page, capture the images in the img tags. """
-    app.logger.info('================= capture_img =====================')
+    # app.logger.info('================= capture_img =====================')
     files, error_files, message, count, error_count = [], [], '', 0, 0
     dur = 'short' if media_type == 'STORY' else 'quick'
     temp = f"{filename}_full.png"
@@ -140,7 +139,7 @@ def capture_img(filename, driver, media_type=''):
         error_files.append(temp)
         error_count += 1
         count -= 1
-    app.logger.info(f"Start of count at {count + 1}. Successful screenshot: {success}. ")
+    # app.logger.info(f"Start of count at {count + 1}. Successful screenshot: {success}. ")
     soup = bs(driver.page_source, 'html.parser')
     # TODO: Determine if we can do this without BeautifulSoup processes.
     target = [img.get('src') for img in soup.findAll('img') if not re.search("^\/", img.get('src'))]
@@ -160,7 +159,7 @@ def capture_img(filename, driver, media_type=''):
             message += f"Error on file # {count} . "
             error_count += 1
             error_files.append(temp)
-            app.logger.exception(e)
+            app.logger.error(e)
     success = error_count == 0
     message += 'Files Saved! ' if success else "Error in Screen Grab. "
     app.logger.info(message)
@@ -172,8 +171,10 @@ def chrome_grab(ig_url, filename, media_type, headless=True):
     """ Using selenium webdriver with Chrome and grabing the file from the page content. """
     # headless = False  # TODO: Usually set as True. Only set to False to visually watch when running locally.
     app.logger.info(f"================= chrome_grab with headless as {headless} ================")
-    driver = setup_chromedriver(headless=headless)
     success, answer = True, {}
+    driver = setup_chromedriver(headless=headless)
+    app.logger.info('-------------------- chrome_grab -----------------')
+    pprint(driver)
     driver.get(ig_url)
     if media_type == 'STORY':
         driver, success = ig_login(driver, current_page=True)
@@ -187,10 +188,11 @@ def chrome_grab(ig_url, filename, media_type, headless=True):
         app.logger.info(f"========== story_click response: {success} ==========")
     if success:
         answer = capture_img(filename, driver)
-        app.logger.info("------ capture_img gave a response ------")
+        # app.logger.info("------ capture_img gave a response ------")
     else:
         message = f"The story_click function had an issue. "
         answer = {'success': success, 'message': message, 'file_list': [], 'error_files': []}
+    app.logger.info("Finishing chrome grab. ")
     pprint(answer)
     driver.quit()  # driver.close() to close tab? driver.exit() to end browser?
     return answer
@@ -249,9 +251,8 @@ def capture(url, filename, media_type='STORY'):
     if not isinstance(media_type, str):
         raise InvalidUsage("The media_type must be a string. ")
     media_type = media_type.upper()
-    ig_url = url or 'https://www.instagram.com/p/B4dQzq8gukI/'
     if not url or not filename:
         raise InvalidUsage("You must have a url and a filename. ")
-    answer = chrome_grab(ig_url, filename, media_type)
+    answer = chrome_grab(url, filename, media_type)
     # answer = soup_no_chrome(ig_url, filename, media_type)
     return answer
